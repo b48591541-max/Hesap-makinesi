@@ -193,10 +193,94 @@
   }
   #chat-send:disabled { opacity: 0.4; }
 
+  /* ---------- THEME (light) ---------- */
+  body.theme-light, body.theme-light #app, body.theme-light .center-screen,
+  body.theme-light #groups-screen, body.theme-light #chat-screen { background: #f4f4f6; }
+  body.theme-light .app-header, body.theme-light #chat-input-bar { background: #ffffff; border-color: #e3e3e6; }
+  body.theme-light .app-header-title, body.theme-light #chat-title, body.theme-light .group-name,
+  body.theme-light h2, body.theme-light h3 { color: #17171a; }
+  body.theme-light .app-header-sub, body.theme-light #chat-sub, body.theme-light .group-sub,
+  body.theme-light .hint, body.theme-light p { color: #6d6d72; }
+  body.theme-light .icon-btn, body.theme-light #chat-photo-btn, body.theme-light #chat-mic-btn,
+  body.theme-light #chat-sticker-btn, body.theme-light .group-avatar, body.theme-light .field-input,
+  body.theme-light .secondary-btn, body.theme-light .modal-sheet, body.theme-light .invite-code-box { background: #ececef; border-color: #dcdce0; color: #17171a; }
+  body.theme-light #chat-input { background: #ececef; border-color: #dcdce0; color: #17171a; }
+  body.theme-light .msg-row.them .bubble { background: #e6e6ea; color: #17171a; }
+  body.theme-light .group-item { border-color: #e5e5e8; }
+  body.theme-light .group-item:active { background: #eeeeef; }
+
+  /* ---------- EXTRA MESSAGE TYPES ---------- */
+  .bubble.sticker { background: transparent !important; padding: 0; }
+  .bubble.sticker .sticker-emoji { font-size: 54px; line-height: 1; display: block; }
+  .bubble video { max-width: 220px; width: 100%; border-radius: 12px; display: block; }
+  .bubble.video { padding: 4px; overflow: hidden; }
+  .bubble audio { width: 200px; }
+  .bubble.audio { padding: 8px 10px; }
+  .msg-deleted { font-style: italic; opacity: 0.55; }
+  .reply-quote {
+    border-left: 3px solid #ff9f0a; background: rgba(255,159,10,0.12);
+    border-radius: 8px; padding: 5px 8px; margin-bottom: 5px; font-size: 12px;
+    max-width: 100%; overflow: hidden;
+  }
+  .reply-quote .rq-sender { color: #ff9f0a; font-weight: 700; display: block; }
+  .reply-quote .rq-text { color: inherit; opacity: 0.85; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+  .bubble-wrap { position: relative; max-width: 75%; touch-action: pan-y; }
+  .msg-row.me .bubble-wrap { margin-left: auto; }
+  .bubble-wrap .bubble { max-width: 100%; }
+  .swipe-reply-icon {
+    position: absolute; top: 50%; left: -30px; transform: translateY(-50%);
+    font-size: 18px; opacity: 0; transition: opacity .15s;
+  }
+  .msg-row.me .swipe-reply-icon { left: auto; right: -30px; }
+
+  /* ---------- CHAT INPUT EXTRAS ---------- */
+  #chat-photo-btn, #chat-mic-btn, #chat-sticker-btn {
+    width: 40px; height: 40px; border-radius: 50%; background: #1c1c1f; border: none;
+    color: #ff9f0a; font-size: 18px; cursor: pointer; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #chat-mic-btn.recording { background: #c0392b; color: #fff; animation: pulse-rec 1s infinite; }
+  @keyframes pulse-rec { 0%,100%{opacity:1;} 50%{opacity:0.55;} }
+  #reply-preview-bar {
+    display: none; align-items: center; gap: 8px; padding: 8px 12px; background: #141416;
+    border-top: 1px solid #1e1e22;
+  }
+  #reply-preview-bar .rp-text { flex: 1; overflow: hidden; }
+  #reply-preview-bar .rp-close { background: none; border: none; color: #8a8a8f; font-size: 18px; cursor: pointer; }
+
+  /* ---------- STICKER / GROUP SETTINGS PANEL ---------- */
+  #sticker-panel {
+    display: none; grid-template-columns: repeat(6, 1fr); gap: 4px; padding: 10px;
+    background: #101012; border-top: 1px solid #1e1e22; max-height: 160px; overflow-y: auto;
+  }
+  #sticker-panel button { background: none; border: none; font-size: 26px; cursor: pointer; padding: 6px; border-radius: 8px; }
+  #sticker-panel button:active { background: #1e1e22; }
+
+  .settings-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    padding: 10px 0; border-bottom: 1px solid #1e1e22;
+  }
+  .settings-row:last-child { border-bottom: none; }
+  .member-row { display: flex; align-items: center; gap: 8px; padding: 8px 0; }
+  .member-row .m-name { flex: 1; color: #fff; font-size: 13.5px; }
+  .member-row .m-tag { font-size: 11px; color: #ff9f0a; border: 1px solid #ff9f0a; border-radius: 6px; padding: 1px 6px; }
+  .theme-choice-row { display: flex; gap: 10px; margin-bottom: 6px; }
+  .theme-choice-row button {
+    flex: 1; padding: 12px; border-radius: 12px; border: 1px solid #2e2e33; background: #1c1c1f;
+    color: #fff; cursor: pointer; font-size: 13px;
+  }
+  .theme-choice-row button.active { border-color: #ff9f0a; color: #ff9f0a; }
+  .danger-btn {
+    width: 100%; background: #3a1414; color: #ff6961; border: 1px solid #5c1a1a;
+    border-radius: 12px; padding: 12px; font-size: 14.5px; font-weight: 600; cursor: pointer; margin-top: 10px;
+  }
+  select.field-input { -webkit-appearance: none; appearance: none; }
+
 </style>
 </head>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <body>
 <div id="fatal-error" style="display:none; position:fixed; inset:0; background:#1a0000; color:#ffb3b3; font-family:monospace; font-size:13px; padding:20px; z-index:9999; overflow:auto; white-space:pre-wrap; line-height:1.5;"></div>
 <script>
@@ -238,6 +322,7 @@
         <div class="app-header-sub" id="groups-user-sub"></div>
       </div>
       <div class="header-spacer"></div>
+      <button class="icon-btn" id="groups-profile" title="Profil">👤</button>
       <button class="icon-btn" id="groups-logout" title="Çıkış yap">⎋</button>
       <button class="icon-btn" id="groups-add">+</button>
     </div>
@@ -281,21 +366,72 @@
       <button class="primary-btn" id="invite-copy" style="margin-bottom:12px;">Kodu kopyala</button>
       <button class="secondary-btn" id="invite-done">Sohbete geç</button>
     </div>
+
+    <!-- PROFILE / SETTINGS -->
+    <div class="modal-sheet" id="modal-profile" style="display:none;">
+      <div class="modal-close-row"><button data-close>×</button></div>
+      <h3>Profil ve ayarlar</h3>
+      <p class="hint">Kullanıcı adını ve uygulama temasını buradan değiştirebilirsin.</p>
+      <input id="profile-name-input" class="field-input" type="text" placeholder="Kullanıcı adı" autocomplete="off" />
+      <div id="profile-error" class="field-error"></div>
+      <button class="primary-btn" id="profile-save" style="margin-bottom:18px;">Kaydet</button>
+      <p class="hint" style="margin-bottom:8px;">Tema</p>
+      <div class="theme-choice-row">
+        <button type="button" id="theme-dark-btn" data-theme="dark">🌙 Koyu</button>
+        <button type="button" id="theme-light-btn" data-theme="light">☀️ Açık</button>
+      </div>
+    </div>
+
+    <!-- GROUP SETTINGS -->
+    <div class="modal-sheet" id="modal-group-settings" style="display:none;">
+      <div class="modal-close-row"><button data-close>×</button></div>
+      <h3>Sohbet ayarları</h3>
+      <input id="group-name-input" class="field-input" type="text" placeholder="Sohbet adı" autocomplete="off" />
+      <div id="group-name-error" class="field-error"></div>
+      <button class="primary-btn" id="group-name-save" style="margin-bottom:16px;">Adı güncelle</button>
+
+      <p class="hint" style="margin-bottom:6px;">Bu sohbetteki takma adın</p>
+      <input id="nickname-input" class="field-input" type="text" placeholder="Takma ad (boş bırakırsan kullanıcı adın görünür)" autocomplete="off" />
+      <button class="secondary-btn" id="nickname-save">Takma adı kaydet</button>
+
+      <p class="hint" style="margin:16px 0 4px;">Üyeler</p>
+      <div id="group-members-list"></div>
+
+      <div id="admin-transfer-block" style="display:none; margin-top:14px;">
+        <p class="hint" style="margin-bottom:6px;">Yöneticiliği devret</p>
+        <select id="admin-transfer-select" class="field-input"></select>
+        <button class="secondary-btn" id="admin-transfer-save">Yönetici yap</button>
+      </div>
+
+      <button class="danger-btn" id="group-delete-btn" style="display:none;">Sohbeti sil</button>
+      <div id="group-settings-error" class="field-error"></div>
+    </div>
   </div>
 
   <!-- CHAT -->
   <div id="chat-screen">
     <div class="app-header">
       <button class="icon-btn" id="chat-back">‹</button>
-      <div>
+      <div style="flex:1; cursor:pointer;" id="chat-title-tap">
         <div class="app-header-title" id="chat-title">Sohbet</div>
         <div class="app-header-sub" id="chat-sub"></div>
       </div>
+      <button class="icon-btn" id="chat-settings-btn" title="Sohbet ayarları">⚙</button>
     </div>
     <div id="chat-messages"><div class="msg-empty">Henüz mesaj yok. İlk mesajı sen yaz.</div></div>
+    <div id="sticker-panel"></div>
+    <div id="reply-preview-bar">
+      <div class="rp-text">
+        <span class="rq-sender" id="reply-preview-sender" style="color:#ff9f0a; font-weight:700; font-size:12px; display:block;"></span>
+        <span class="rq-text" id="reply-preview-text" style="color:#c9c9cd; font-size:12.5px; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"></span>
+      </div>
+      <button class="rp-close" id="reply-preview-close">×</button>
+    </div>
     <div id="chat-input-bar">
-      <button id="chat-photo-btn">📷</button>
-      <input id="chat-photo-file" type="file" accept="image/*" style="display:none;" />
+      <button id="chat-sticker-btn" title="Çıkartma/GIF">😊</button>
+      <button id="chat-photo-btn" title="Fotoğraf/Video/GIF">📷</button>
+      <input id="chat-photo-file" type="file" accept="image/*,video/*" style="display:none;" />
+      <button id="chat-mic-btn" title="Sesli mesaj">🎤</button>
       <input id="chat-input" type="text" placeholder="Mesaj yaz..." autocomplete="off" />
       <button id="chat-send">➤</button>
     </div>
@@ -305,9 +441,6 @@
 <script>
 (function(){
   "use strict";
-
-  // >>> BURAYI DEĞİŞTİR: Firebase Realtime Database URL'ini buraya yapıştır <<<
-  const FIREBASE_DB_URL = "https://mesajlasma-eb7d7-default-rtdb.europe-west1.firebasedatabase.app";
 
   const firebaseConfig = {
     apiKey: "AIzaSyCNXp0QOsNpykoa96rm3j9izWyZDFV1WMA",
@@ -320,6 +453,7 @@
   };
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
+  const db = firebase.database();
 
   // ---------------- SCREENS ----------------
   const authScreen = document.getElementById('auth-screen');
@@ -367,20 +501,119 @@
     return Array.from(bytes).map(b => b.toString(16).padStart(2,'0')).join('');
   }
 
-  // ---------------- LOCAL STORAGE (groups only — profile comes from Firebase Auth) ----------------
-  function loadGroups(){
-    try { const raw = localStorage.getItem('app_groups'); return raw ? JSON.parse(raw) : []; }
-    catch (e) { return []; }
+  // ---------------- GRUPLAR (Firebase'de, hesaba bağlı — cihazdan bağımsız senkron) ----------------
+  let groupsListenerRef = null;
+
+  function groupsRef(){
+    return db.ref('users/' + profile.uid + '/groups');
   }
-  function saveGroups(list){
-    try { localStorage.setItem('app_groups', JSON.stringify(list)); return true; }
-    catch (e) { return false; }
+
+  function attachGroupsListener(){
+    detachGroupsListener();
+    groupsListenerRef = groupsRef();
+    groupsListenerRef.on('value', (snapshot) => {
+      const val = snapshot.val() || {};
+      groups = Object.keys(val).map(id => ({ id, name: val[id].name }))
+        .sort((a, b) => (val[b.id].updatedAt || 0) - (val[a.id].updatedAt || 0));
+      renderGroups();
+    }, (err) => {
+      showErrorOnGroupsScreen('Sohbetler yüklenemedi: ' + (err && err.message ? err.message : String(err)));
+    });
+  }
+
+  function detachGroupsListener(){
+    if (groupsListenerRef) { groupsListenerRef.off(); groupsListenerRef = null; }
+  }
+
+  function addGroup(id, name){
+    return groupsRef().child(id).set({ name, updatedAt: Date.now() });
+  }
+
+  function showErrorOnGroupsScreen(text){
+    const listEl = document.getElementById('groups-list');
+    if (listEl) listEl.innerHTML = '<div class="groups-empty">' + text + '</div>';
   }
 
   let profile = null;
   let groups = [];
   let activeGroup = null;
   let session = { roomHash: null, key: null };
+
+  // ---------------- YENİ ÖZELLİKLER İÇİN DURUM ----------------
+  let groupMetaListenerRef = null;
+  let groupMetaVal = null;      // { name, adminUid, members: { uid: {name, nickname} } }
+  let myNickname = null;
+  let replyTo = null;           // { sender, snippet, type }
+  let mediaRecorder = null;
+  let recordedChunks = [];
+  let longPressTimer = null;
+
+  const STICKERS = ['😀','😂','😍','😎','🥳','😭','😡','👍','👎','🙏','🔥','💯',
+    '❤️','💔','🎉','👏','😴','🤔','😱','🙌','🤝','😇','🥰','😅',
+    '🐱','🐶','🌹','⭐','☕','🍕'];
+
+  function groupMetaRef(hash){
+    return db.ref('groupMeta/' + hash);
+  }
+
+  // Bu sohbette görünen ad: takma ad varsa o, yoksa kullanıcı adı.
+  function myDisplayNameInGroup(){
+    return (myNickname && myNickname.trim()) ? myNickname.trim() : profile.name;
+  }
+
+  async function ensureGroupMeta(group, hash){
+    const ref = groupMetaRef(hash);
+    const snap = await ref.once('value');
+    const val = snap.val();
+    if (!val) {
+      await ref.set({
+        name: group.name,
+        adminUid: profile.uid,
+        members: { [profile.uid]: { name: profile.name, nickname: null } },
+        updatedAt: Date.now()
+      });
+    } else {
+      await ref.child('members/' + profile.uid).update({ name: profile.name });
+    }
+  }
+
+  function attachGroupMetaListener(hash){
+    detachGroupMetaListener();
+    groupMetaListenerRef = groupMetaRef(hash);
+    groupMetaListenerRef.on('value', (snap) => {
+      groupMetaVal = snap.val();
+      if (!groupMetaVal) {
+        // grup silinmiş
+        document.getElementById('chat-title').textContent = 'Sohbet silindi';
+        document.getElementById('chat-sub').textContent = '';
+        return;
+      }
+      const mine = groupMetaVal.members && groupMetaVal.members[profile.uid];
+      myNickname = mine ? (mine.nickname || null) : null;
+      document.getElementById('chat-title').textContent = groupMetaVal.name || activeGroup.name;
+      const isAdmin = groupMetaVal.adminUid === profile.uid;
+      document.getElementById('chat-sub').textContent = isAdmin ? 'Yönetici: sen' : '';
+      renderGroupSettingsIfOpen();
+    });
+  }
+
+  function detachGroupMetaListener(){
+    if (groupMetaListenerRef) { groupMetaListenerRef.off(); groupMetaListenerRef = null; }
+    groupMetaVal = null;
+  }
+
+  // ---------------- TEMA ----------------
+  function applyTheme(theme){
+    document.body.classList.toggle('theme-light', theme === 'light');
+    document.getElementById('theme-dark-btn').classList.toggle('active', theme !== 'light');
+    document.getElementById('theme-light-btn').classList.toggle('active', theme === 'light');
+    try { localStorage.setItem('chatAppTheme', theme); } catch (e) {}
+  }
+  (function initTheme(){
+    let saved = 'dark';
+    try { saved = localStorage.getItem('chatAppTheme') || 'dark'; } catch (e) {}
+    applyTheme(saved);
+  })();
 
   // ---------------- AUTH SCREEN LOGIC ----------------
   let authMode = 'login'; // veya 'signup'
@@ -461,7 +694,8 @@
   });
 
   document.getElementById('groups-logout').addEventListener('click', () => {
-    stopPolling();
+    stopMessageListener();
+    detachGroupsListener();
     auth.signOut();
   });
 
@@ -473,7 +707,10 @@
       if (subEl) subEl.textContent = profile.name;
       showGroupsScreen();
     } else {
+      stopMessageListener();
+      detachGroupsListener();
       profile = null;
+      groups = [];
       authEmailInput.value = '';
       authPasswordInput.value = '';
       authNameInput.value = '';
@@ -483,8 +720,8 @@
   });
 
   function showGroupsScreen(){
-    groups = loadGroups();
     renderGroups();
+    attachGroupsListener();
     show(groupsScreen);
   }
 
@@ -520,6 +757,8 @@
     create: document.getElementById('modal-create'),
     join: document.getElementById('modal-join'),
     invite: document.getElementById('modal-invite'),
+    profile: document.getElementById('modal-profile'),
+    groupSettings: document.getElementById('modal-group-settings'),
   };
 
   function openModal(view){
@@ -534,6 +773,9 @@
     document.getElementById('join-code-input').value = '';
     document.getElementById('join-name-input').value = '';
     document.getElementById('join-error').textContent = '';
+    document.getElementById('profile-error').textContent = '';
+    document.getElementById('group-name-error').textContent = '';
+    document.getElementById('group-settings-error').textContent = '';
   }
 
   document.getElementById('groups-add').addEventListener('click', () => openModal('choose'));
@@ -545,18 +787,23 @@
 
   let pendingNewGroup = null;
 
-  document.getElementById('create-submit').addEventListener('click', () => {
+  document.getElementById('create-submit').addEventListener('click', async () => {
     const name = document.getElementById('create-name-input').value.trim();
     const err = document.getElementById('create-error');
+    const btn = document.getElementById('create-submit');
     if (!name) { err.textContent = 'Bir sohbet adı gir.'; return; }
     const id = generateId();
-    const group = { id, name };
-    groups.unshift(group);
-    if (!saveGroups(groups)) { err.textContent = 'Kaydedilemedi, tekrar dene.'; return; }
-    pendingNewGroup = group;
-    document.getElementById('invite-code-text').textContent = id;
-    document.getElementById('invite-copy').textContent = 'Kodu kopyala';
-    openModal('invite');
+    btn.disabled = true;
+    try {
+      await addGroup(id, name);
+      pendingNewGroup = { id, name };
+      document.getElementById('invite-code-text').textContent = id;
+      document.getElementById('invite-copy').textContent = 'Kodu kopyala';
+      openModal('invite');
+    } catch (e) {
+      err.textContent = 'Kaydedilemedi: ' + (e && e.message ? e.message : String(e));
+    }
+    btn.disabled = false;
   });
 
   document.getElementById('invite-copy').addEventListener('click', async () => {
@@ -585,18 +832,51 @@
     pendingNewGroup = null;
   });
 
-  document.getElementById('join-submit').addEventListener('click', () => {
+  document.getElementById('join-submit').addEventListener('click', async () => {
     const code = document.getElementById('join-code-input').value.trim();
     const name = document.getElementById('join-name-input').value.trim();
     const err = document.getElementById('join-error');
+    const btn = document.getElementById('join-submit');
     if (!code || code.length < 8) { err.textContent = 'Geçerli bir davet kodu yapıştır.'; return; }
     if (!name) { err.textContent = 'Bu sohbete bir isim ver.'; return; }
-    const group = { id: code, name };
-    groups.unshift(group);
-    if (!saveGroups(groups)) { err.textContent = 'Kaydedilemedi, tekrar dene.'; return; }
-    closeModal();
-    renderGroups();
-    openChat(group);
+    btn.disabled = true;
+    try {
+      await addGroup(code, name);
+      closeModal();
+      openChat({ id: code, name });
+    } catch (e) {
+      err.textContent = 'Kaydedilemedi: ' + (e && e.message ? e.message : String(e));
+    }
+    btn.disabled = false;
+  });
+
+  // ---------------- PROFİL / KULLANICI ADI / TEMA ----------------
+  document.getElementById('groups-profile').addEventListener('click', () => {
+    document.getElementById('profile-name-input').value = profile ? profile.name : '';
+    document.getElementById('profile-error').textContent = '';
+    openModal('profile');
+  });
+
+  document.getElementById('theme-dark-btn').addEventListener('click', () => applyTheme('dark'));
+  document.getElementById('theme-light-btn').addEventListener('click', () => applyTheme('light'));
+
+  document.getElementById('profile-save').addEventListener('click', async () => {
+    const newName = document.getElementById('profile-name-input').value.trim();
+    const err = document.getElementById('profile-error');
+    const btn = document.getElementById('profile-save');
+    if (!newName) { err.textContent = 'Bir kullanıcı adı gir.'; return; }
+    btn.disabled = true;
+    try {
+      await auth.currentUser.updateProfile({ displayName: newName });
+      await auth.currentUser.reload();
+      profile.name = newName;
+      const subEl = document.getElementById('groups-user-sub');
+      if (subEl) subEl.textContent = profile.name;
+      closeModal();
+    } catch (e) {
+      err.textContent = 'Güncellenemedi: ' + (e && e.message ? e.message : String(e));
+    }
+    btn.disabled = false;
   });
 
   // ---------------- CHAT ----------------
@@ -605,28 +885,159 @@
   const sendBtn = document.getElementById('chat-send');
   const photoBtn = document.getElementById('chat-photo-btn');
   const photoFileEl = document.getElementById('chat-photo-file');
+  const stickerBtn = document.getElementById('chat-sticker-btn');
+  const stickerPanel = document.getElementById('sticker-panel');
+  const micBtn = document.getElementById('chat-mic-btn');
+  const replyBar = document.getElementById('reply-preview-bar');
 
-  let pollTimer = null;
+  const PAGE_SIZE = 30;
   let renderedMessages = [];
   let loadedKeys = new Set();
-  let lastTs = 0;
+  let oldestLoadedTs = null;
+  let messageListenerRef = null;
+  let noOlderLeft = false;
 
   async function initRoomForGroup(group){
     session.roomHash = (await sha256Hex(group.id)).slice(0, 20);
     session.key = await deriveKey(group.id);
+    await ensureGroupMeta(group, session.roomHash);
+    attachGroupMetaListener(session.roomHash);
   }
 
   function openChat(group){
     activeGroup = group;
     document.getElementById('chat-title').textContent = group.name;
     document.getElementById('chat-sub').textContent = '';
+    replyTo = null;
+    updateReplyPreviewBar();
+    document.getElementById('sticker-panel').style.display = 'none';
     show(chatScreen);
-    initRoomForGroup(group).then(() => startPolling());
+    initRoomForGroup(group).then(() => startMessageListener());
   }
 
   document.getElementById('chat-back').addEventListener('click', () => {
-    stopPolling();
+    stopMessageListener();
+    detachGroupMetaListener();
     showGroupsScreen();
+  });
+
+  // ---------------- GRUP AYARLARI (isim, takma ad, yönetici, silme) ----------------
+  function openGroupSettings(){
+    if (!groupMetaVal) return;
+    document.getElementById('group-name-input').value = groupMetaVal.name || '';
+    document.getElementById('nickname-input').value = myNickname || '';
+    document.getElementById('group-name-error').textContent = '';
+    document.getElementById('group-settings-error').textContent = '';
+    openModal('groupSettings');
+    renderGroupSettingsIfOpen();
+  }
+
+  function renderGroupSettingsIfOpen(){
+    const sheet = document.getElementById('modal-group-settings');
+    if (!groupMetaVal || sheet.style.display === 'none' || overlay.style.display === 'none') return;
+    const isAdmin = groupMetaVal.adminUid === profile.uid;
+    const members = groupMetaVal.members || {};
+    const listEl = document.getElementById('group-members-list');
+    listEl.innerHTML = '';
+    Object.keys(members).forEach(uid => {
+      const m = members[uid];
+      const row = document.createElement('div');
+      row.className = 'member-row';
+      const nameEl = document.createElement('div');
+      nameEl.className = 'm-name';
+      let label = m.nickname && m.nickname.trim() ? (m.nickname + ' (' + m.name + ')') : m.name;
+      if (uid === profile.uid) label += ' — Sen';
+      nameEl.textContent = label;
+      row.appendChild(nameEl);
+      if (uid === groupMetaVal.adminUid) {
+        const tag = document.createElement('span');
+        tag.className = 'm-tag';
+        tag.textContent = 'Yönetici';
+        row.appendChild(tag);
+      }
+      listEl.appendChild(row);
+    });
+
+    document.getElementById('admin-transfer-block').style.display = isAdmin ? 'block' : 'none';
+    document.getElementById('group-delete-btn').style.display = isAdmin ? 'block' : 'none';
+    if (isAdmin) {
+      const sel = document.getElementById('admin-transfer-select');
+      sel.innerHTML = '';
+      Object.keys(members).forEach(uid => {
+        if (uid === profile.uid) return;
+        const opt = document.createElement('option');
+        opt.value = uid;
+        opt.textContent = members[uid].nickname || members[uid].name;
+        sel.appendChild(opt);
+      });
+      if (!sel.options.length) {
+        document.getElementById('admin-transfer-block').style.display = 'none';
+      }
+    }
+  }
+
+  document.getElementById('chat-settings-btn').addEventListener('click', openGroupSettings);
+  document.getElementById('chat-title-tap').addEventListener('click', openGroupSettings);
+
+  document.getElementById('group-name-save').addEventListener('click', async () => {
+    const err = document.getElementById('group-name-error');
+    err.textContent = '';
+    if (!groupMetaVal || groupMetaVal.adminUid !== profile.uid) {
+      err.textContent = 'Sadece yönetici sohbet adını değiştirebilir.';
+      return;
+    }
+    const newName = document.getElementById('group-name-input').value.trim();
+    if (!newName) { err.textContent = 'Bir isim gir.'; return; }
+    try {
+      await groupMetaRef(session.roomHash).update({ name: newName, updatedAt: Date.now() });
+      await addGroup(activeGroup.id, newName); // kendi listendeki etiketi de güncelle
+      activeGroup.name = newName;
+    } catch (e) {
+      err.textContent = 'Güncellenemedi: ' + (e && e.message ? e.message : String(e));
+    }
+  });
+
+  document.getElementById('nickname-save').addEventListener('click', async () => {
+    const val = document.getElementById('nickname-input').value.trim();
+    try {
+      await groupMetaRef(session.roomHash).child('members/' + profile.uid).update({ nickname: val || null });
+      myNickname = val || null;
+    } catch (e) {
+      document.getElementById('group-settings-error').textContent = 'Takma ad kaydedilemedi: ' + (e && e.message ? e.message : String(e));
+    }
+  });
+
+  document.getElementById('admin-transfer-save').addEventListener('click', async () => {
+    const err = document.getElementById('group-settings-error');
+    if (!groupMetaVal || groupMetaVal.adminUid !== profile.uid) { err.textContent = 'Sadece yönetici devredebilir.'; return; }
+    const sel = document.getElementById('admin-transfer-select');
+    if (!sel.value) return;
+    try {
+      await groupMetaRef(session.roomHash).update({ adminUid: sel.value });
+    } catch (e) {
+      err.textContent = 'Devredilemedi: ' + (e && e.message ? e.message : String(e));
+    }
+  });
+
+  document.getElementById('group-delete-btn').addEventListener('click', async () => {
+    if (!groupMetaVal || groupMetaVal.adminUid !== profile.uid) return;
+    if (!confirm('Bu sohbeti tamamen silmek istediğine emin misin? Tüm mesajlar kalıcı olarak silinecek.')) return;
+    const btn = document.getElementById('group-delete-btn');
+    btn.disabled = true;
+    try {
+      const hash = session.roomHash;
+      const id = activeGroup.id;
+      await db.ref('messages/' + hash).remove();
+      await groupMetaRef(hash).remove();
+      await groupsRef().child(id).remove();
+      closeModal();
+      stopMessageListener();
+      detachGroupMetaListener();
+      showGroupsScreen();
+    } catch (e) {
+      document.getElementById('group-settings-error').textContent = 'Silinemedi: ' + (e && e.message ? e.message : String(e));
+    }
+    btn.disabled = false;
   });
 
   function showErrorBubble(text){
@@ -641,99 +1052,320 @@
     messagesEl.scrollTop = messagesEl.scrollHeight;
   }
 
+  // ---------------- YANITLAMA (kaydırarak) ----------------
+  function updateReplyPreviewBar(){
+    if (replyTo) {
+      document.getElementById('reply-preview-sender').textContent = replyTo.sender;
+      document.getElementById('reply-preview-text').textContent = replyTo.snippet;
+      replyBar.style.display = 'flex';
+    } else {
+      replyBar.style.display = 'none';
+    }
+  }
+  document.getElementById('reply-preview-close').addEventListener('click', () => {
+    replyTo = null;
+    updateReplyPreviewBar();
+  });
+
+  function snippetFor(m){
+    if (m.type === 'text') return m.content;
+    if (m.type === 'image') return '📷 Fotoğraf';
+    if (m.type === 'gif') return 'GIF';
+    if (m.type === 'video') return '🎬 Video';
+    if (m.type === 'audio') return '🎤 Sesli mesaj';
+    if (m.type === 'sticker') return '😊 Çıkartma';
+    return 'Mesaj';
+  }
+
+  function setReplyTarget(m){
+    replyTo = { sender: m.sender, snippet: snippetFor(m), type: m.type };
+    updateReplyPreviewBar();
+    inputEl.focus();
+  }
+
+  // ---------------- MESAJ SİLME ----------------
+  async function deleteMessage(m){
+    if (!confirm('Bu mesajı silmek istiyor musun?')) return;
+    try {
+      await messagesRef().child(m.key).remove();
+    } catch (e) {
+      showErrorBubble('Silinemedi: ' + (e && e.message ? e.message : String(e)));
+    }
+  }
+
+  // ---------------- MESAJ AKSİYON MENÜSÜ (uzun basma) ----------------
+  function showMessageActions(m, bubbleWrap){
+    const menu = document.createElement('div');
+    menu.style.position = 'fixed';
+    menu.style.inset = '0';
+    menu.style.background = 'rgba(0,0,0,0.4)';
+    menu.style.zIndex = '80';
+    menu.style.display = 'flex';
+    menu.style.alignItems = 'flex-end';
+    menu.style.justifyContent = 'center';
+    const sheet = document.createElement('div');
+    sheet.style.background = '#161618';
+    sheet.style.borderRadius = '16px 16px 0 0';
+    sheet.style.width = '100%';
+    sheet.style.maxWidth = '400px';
+    sheet.style.padding = '10px';
+    const replyBtnEl = document.createElement('button');
+    replyBtnEl.textContent = '↩ Yanıtla';
+    replyBtnEl.className = 'secondary-btn';
+    replyBtnEl.style.marginBottom = '8px';
+    replyBtnEl.addEventListener('click', () => { setReplyTarget(m); document.body.removeChild(menu); });
+    sheet.appendChild(replyBtnEl);
+    if (m.senderUid === profile.uid) {
+      const delBtnEl = document.createElement('button');
+      delBtnEl.textContent = '🗑 Sil';
+      delBtnEl.className = 'danger-btn';
+      delBtnEl.style.marginTop = '0';
+      delBtnEl.addEventListener('click', () => { document.body.removeChild(menu); deleteMessage(m); });
+      sheet.appendChild(delBtnEl);
+    }
+    menu.appendChild(sheet);
+    menu.addEventListener('click', (e) => { if (e.target === menu) document.body.removeChild(menu); });
+    document.body.appendChild(menu);
+  }
+
+  function attachBubbleGestures(wrapEl, m){
+    let startX = 0, dx = 0, dragging = false;
+    const iconEl = wrapEl.querySelector('.swipe-reply-icon');
+
+    wrapEl.addEventListener('touchstart', (e) => {
+      startX = e.touches[0].clientX; dx = 0; dragging = true;
+      longPressTimer = setTimeout(() => { showMessageActions(m, wrapEl); dragging = false; }, 550);
+    }, { passive: true });
+
+    wrapEl.addEventListener('touchmove', (e) => {
+      if (!dragging) return;
+      clearTimeout(longPressTimer);
+      dx = e.touches[0].clientX - startX;
+      const clamped = Math.max(-60, Math.min(60, dx));
+      wrapEl.style.transform = 'translateX(' + clamped + 'px)';
+      if (iconEl) iconEl.style.opacity = Math.min(1, Math.abs(clamped) / 45);
+    }, { passive: true });
+
+    wrapEl.addEventListener('touchend', () => {
+      clearTimeout(longPressTimer);
+      wrapEl.style.transform = 'translateX(0)';
+      if (iconEl) iconEl.style.opacity = 0;
+      if (dragging && Math.abs(dx) > 48) setReplyTarget(m);
+      dragging = false;
+    });
+
+    // masaüstü/mouse için basit sağ tık = aksiyon menüsü
+    wrapEl.addEventListener('contextmenu', (e) => { e.preventDefault(); showMessageActions(m, wrapEl); });
+  }
+
   function renderMessages(){
+    const prevScrollFromBottom = messagesEl.scrollHeight - messagesEl.scrollTop;
     if (!renderedMessages.length) {
       messagesEl.innerHTML = '<div class="msg-empty">Henüz mesaj yok. İlk mesajı sen yaz.</div>';
       return;
     }
     renderedMessages.sort((a,b) => a.ts - b.ts);
     messagesEl.innerHTML = '';
+    if (!noOlderLeft) {
+      const loadMoreRow = document.createElement('div');
+      loadMoreRow.id = 'load-older-row';
+      loadMoreRow.style.textAlign = 'center';
+      loadMoreRow.style.margin = '4px 0 10px';
+      const loadMoreBtn = document.createElement('button');
+      loadMoreBtn.textContent = 'Daha eski mesajları yükle';
+      loadMoreBtn.style.background = 'none';
+      loadMoreBtn.style.border = 'none';
+      loadMoreBtn.style.color = '#ff9f0a';
+      loadMoreBtn.style.fontSize = '12.5px';
+      loadMoreBtn.style.cursor = 'pointer';
+      loadMoreBtn.addEventListener('click', loadOlderMessages);
+      loadMoreRow.appendChild(loadMoreBtn);
+      messagesEl.appendChild(loadMoreRow);
+    }
+    const myName = myDisplayNameInGroup();
     for (const m of renderedMessages) {
+      const isMe = m.senderUid ? (m.senderUid === profile.uid) : (m.sender === myName);
       const row = document.createElement('div');
-      row.className = 'msg-row ' + (m.sender === profile.name ? 'me' : 'them');
+      row.className = 'msg-row ' + (isMe ? 'me' : 'them');
+
+      const wrap = document.createElement('div');
+      wrap.className = 'bubble-wrap';
+
+      const icon = document.createElement('span');
+      icon.className = 'swipe-reply-icon';
+      icon.textContent = '↩';
+      wrap.appendChild(icon);
+
       const bubble = document.createElement('div');
-      bubble.className = 'bubble' + (m.type === 'image' ? ' image' : '');
-      if (m.sender !== profile.name) {
+      bubble.className = 'bubble' + (m.type === 'image' ? ' image' : m.type === 'video' ? ' video' : m.type === 'audio' ? ' audio' : m.type === 'sticker' ? ' sticker' : '');
+
+      if (m.deleted) {
+        bubble.classList.add('msg-deleted');
+        bubble.textContent = 'Bu mesaj silindi';
+        wrap.appendChild(bubble);
+        row.appendChild(wrap);
+        messagesEl.appendChild(row);
+        continue;
+      }
+
+      if (!isMe) {
         const s = document.createElement('span');
         s.className = 'sender';
         s.textContent = m.sender;
         bubble.appendChild(s);
       }
+
+      if (m.replyTo) {
+        const q = document.createElement('div');
+        q.className = 'reply-quote';
+        const rs = document.createElement('span'); rs.className = 'rq-sender'; rs.textContent = m.replyTo.sender;
+        const rt = document.createElement('span'); rt.className = 'rq-text'; rt.textContent = m.replyTo.snippet;
+        q.appendChild(rs); q.appendChild(rt);
+        bubble.appendChild(q);
+      }
+
       if (m.type === 'image') {
         const img = document.createElement('img');
         img.src = 'data:image/jpeg;base64,' + m.content;
         bubble.appendChild(img);
+      } else if (m.type === 'gif') {
+        const img = document.createElement('img');
+        img.src = m.content; // tam data URL
+        bubble.appendChild(img);
+      } else if (m.type === 'video') {
+        const vid = document.createElement('video');
+        vid.src = m.content; vid.controls = true; vid.playsInline = true;
+        bubble.appendChild(vid);
+      } else if (m.type === 'audio') {
+        const aud = document.createElement('audio');
+        aud.src = m.content; aud.controls = true;
+        bubble.appendChild(aud);
+      } else if (m.type === 'sticker') {
+        const em = document.createElement('span');
+        em.className = 'sticker-emoji';
+        em.textContent = m.content;
+        bubble.appendChild(em);
       } else {
         bubble.appendChild(document.createTextNode(m.content));
       }
-      row.appendChild(bubble);
+
+      wrap.appendChild(bubble);
+      row.appendChild(wrap);
       messagesEl.appendChild(row);
+      attachBubbleGestures(wrap, m);
     }
-    messagesEl.scrollTop = messagesEl.scrollHeight;
+    if (renderMessages._keepScroll) {
+      messagesEl.scrollTop = messagesEl.scrollHeight - prevScrollFromBottom;
+      renderMessages._keepScroll = false;
+    } else {
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
   }
 
-  function roomUrl(){
-    return FIREBASE_DB_URL.replace(/\/$/, '') + '/messages/' + session.roomHash;
+  function messagesRef(){
+    return db.ref('messages/' + session.roomHash);
   }
 
-  async function pollNewMessages(){
+  // Şifreli kayıttan { sender, type, content, replyTo } içeren paketi çözer.
+  // Gönderen adı, mesaj türü ve yanıtlanan mesaj özeti de şifrelenmiş paketin İÇİNDE.
+  async function decryptItem(item, key){
+    const payloadJson = await decryptText(session.key, item.iv, item.ct);
+    const payload = JSON.parse(payloadJson);
+    return {
+      key,
+      sender: payload.sender,
+      senderUid: payload.senderUid || null,
+      type: payload.type || 'text',
+      content: payload.content,
+      replyTo: payload.replyTo || null,
+      ts: item.ts
+    };
+  }
+
+  function startMessageListener(){
+    renderedMessages = [];
+    loadedKeys = new Set();
+    oldestLoadedTs = null;
+    noOlderLeft = false;
+    renderMessages();
+    stopMessageListener();
+    // limitToLast: önce son PAGE_SIZE mesajı getirir, sonra yeni gelenleri anlık olarak akıtır.
+    messageListenerRef = messagesRef().orderByChild('ts').limitToLast(PAGE_SIZE);
+    messageListenerRef.on('child_added', async (snapshot) => {
+      const key = snapshot.key;
+      if (loadedKeys.has(key)) return;
+      loadedKeys.add(key);
+      const item = snapshot.val();
+      try {
+        const msg = await decryptItem(item, key);
+        renderedMessages.push(msg);
+        if (oldestLoadedTs === null || item.ts < oldestLoadedTs) oldestLoadedTs = item.ts;
+        renderMessages();
+      } catch (e) {
+        // çözülemeyen kayıt (başka bir grubun anahtarıyla şifrelenmiş olabilir), atla
+      }
+    });
+    messageListenerRef.on('child_removed', (snapshot) => {
+      const key = snapshot.key;
+      renderedMessages = renderedMessages.filter(m => m.key !== key);
+      loadedKeys.delete(key);
+      renderMessages();
+    });
+    messageListenerRef.on('child_added', () => {}, (err) => {
+      showErrorBubble('Bağlantı hatası: ' + (err && err.message ? err.message : String(err)));
+    });
+  }
+
+  function stopMessageListener(){
+    if (messageListenerRef) { messageListenerRef.off(); messageListenerRef = null; }
+  }
+
+  async function loadOlderMessages(){
+    if (oldestLoadedTs === null || noOlderLeft) return;
+    const btn = document.querySelector('#load-older-row button');
+    if (btn) { btn.textContent = 'Yükleniyor...'; btn.disabled = true; }
     try {
-      const res = await fetch(roomUrl() + '.json');
-      if (!res.ok) return;
-      const data = await res.json();
-      if (!data) return;
-      let changed = false;
-      for (const key of Object.keys(data)) {
+      const snapshot = await messagesRef().orderByChild('ts').endAt(oldestLoadedTs - 1).limitToLast(PAGE_SIZE).once('value');
+      const val = snapshot.val() || {};
+      const keys = Object.keys(val);
+      if (!keys.length) { noOlderLeft = true; renderMessages(); return; }
+      for (const key of keys) {
         if (loadedKeys.has(key)) continue;
-        const item = data[key];
+        loadedKeys.add(key);
+        const item = val[key];
         try {
-          const content = await decryptText(session.key, item.iv, item.ct);
-          renderedMessages.push({ sender: item.sender, type: item.type || 'text', content, ts: item.ts });
-          if (item.ts > lastTs) lastTs = item.ts;
+          const msg = await decryptItem(item, key);
+          renderedMessages.push(msg);
+          if (item.ts < oldestLoadedTs) oldestLoadedTs = item.ts;
         } catch (e) {
           // çözülemeyen kayıt, atla
         }
-        loadedKeys.add(key);
-        changed = true;
       }
-      if (changed) renderMessages();
+      if (keys.length < PAGE_SIZE) noOlderLeft = true;
+      renderMessages._keepScroll = true;
+      renderMessages();
     } catch (e) {
-      // ağ hatası, sessizce yeniden dene
+      showErrorBubble('Eski mesajlar yüklenemedi: ' + (e && e.message ? e.message : String(e)));
     }
-  }
-
-  function startPolling(){
-    renderedMessages = [];
-    loadedKeys = new Set();
-    lastTs = 0;
-    renderMessages();
-    pollNewMessages();
-    if (pollTimer) clearInterval(pollTimer);
-    pollTimer = setInterval(pollNewMessages, 3000);
-  }
-
-  function stopPolling(){
-    if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+    if (btn) { btn.textContent = 'Daha eski mesajları yükle'; btn.disabled = false; }
   }
 
   async function pushMessage(type, content){
     try {
-      const { iv, ct } = await encryptText(session.key, content);
-      const ts = Date.now();
-      const key = ts + '_' + Math.random().toString(36).slice(2,8);
-      const res = await fetch(roomUrl() + '/' + key + '.json', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ iv, ct, type, sender: profile.name, ts })
+      const payload = JSON.stringify({
+        sender: myDisplayNameInGroup(),
+        senderUid: profile.uid,
+        type,
+        content,
+        replyTo: replyTo
       });
-      if (!res.ok) {
-        const bodyText = await res.text().catch(() => '');
-        throw new Error('HTTP ' + res.status + ' ' + res.statusText + (bodyText ? ' — ' + bodyText : ''));
-      }
-      renderedMessages.push({ sender: profile.name, type, content, ts });
-      loadedKeys.add(key);
-      if (ts > lastTs) lastTs = ts;
-      renderMessages();
+      const { iv, ct } = await encryptText(session.key, payload);
+      const ts = Date.now();
+      const newRef = messagesRef().push();
+      await newRef.set({ iv, ct, ts });
+      replyTo = null;
+      updateReplyPreviewBar();
+      // renderMessages'a eklemeye gerek yok: 'child_added' dinleyicisi bunu zaten anlık olarak yakalayıp gösterecek.
     } catch (e) {
       showErrorBubble('Gönderilemedi — hata: ' + (e && e.message ? e.message : String(e)));
     }
@@ -778,16 +1410,84 @@
     });
   }
 
+  function readFileAsDataURL(file){
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = () => reject(new Error('dosya okunamadı'));
+      reader.onload = () => resolve(reader.result);
+      reader.readAsDataURL(file);
+    });
+  }
+
+  const MAX_MEDIA_BYTES = 6 * 1024 * 1024; // ~6MB — RTDB'ye base64 olarak yazılabilecek makul üst sınır
+
   photoBtn.addEventListener('click', () => photoFileEl.click());
   photoFileEl.addEventListener('change', async (e) => {
     const file = e.target.files[0];
     e.target.value = '';
     if (!file) return;
     try {
-      const base64 = await resizeImageFile(file);
-      await pushMessage('image', base64);
+      if (file.type === 'image/gif') {
+        if (file.size > MAX_MEDIA_BYTES) throw new Error('GIF çok büyük (maks. 6MB).');
+        const dataUrl = await readFileAsDataURL(file);
+        await pushMessage('gif', dataUrl);
+      } else if (file.type.startsWith('video/')) {
+        if (file.size > MAX_MEDIA_BYTES) throw new Error('Video çok büyük (maks. 6MB). Daha kısa/küçük bir video dene.');
+        const dataUrl = await readFileAsDataURL(file);
+        await pushMessage('video', dataUrl);
+      } else if (file.type.startsWith('image/')) {
+        const base64 = await resizeImageFile(file);
+        await pushMessage('image', base64);
+      } else {
+        throw new Error('Desteklenmeyen dosya türü.');
+      }
     } catch (err) {
-      showErrorBubble('Fotoğraf gönderilemedi: ' + (err && err.message ? err.message : String(err)));
+      showErrorBubble('Gönderilemedi: ' + (err && err.message ? err.message : String(err)));
+    }
+  });
+
+  // ---------------- ÇIKARTMALAR (STICKER) ----------------
+  STICKERS.forEach(emoji => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = emoji;
+    b.addEventListener('click', async () => {
+      stickerPanel.style.display = 'none';
+      await pushMessage('sticker', emoji);
+    });
+    stickerPanel.appendChild(b);
+  });
+  stickerBtn.addEventListener('click', () => {
+    stickerPanel.style.display = stickerPanel.style.display === 'grid' ? 'none' : 'grid';
+  });
+
+  // ---------------- SESLİ MESAJ KAYDI ----------------
+  micBtn.addEventListener('click', async () => {
+    if (mediaRecorder && mediaRecorder.state === 'recording') {
+      mediaRecorder.stop();
+      return;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      recordedChunks = [];
+      mediaRecorder = new MediaRecorder(stream);
+      mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) recordedChunks.push(e.data); };
+      mediaRecorder.onstop = async () => {
+        micBtn.classList.remove('recording');
+        stream.getTracks().forEach(t => t.stop());
+        const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+        if (blob.size > MAX_MEDIA_BYTES) {
+          showErrorBubble('Ses kaydı çok uzun/büyük, kısa bir mesaj dene.');
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = async () => { await pushMessage('audio', reader.result); };
+        reader.readAsDataURL(blob);
+      };
+      mediaRecorder.start();
+      micBtn.classList.add('recording');
+    } catch (err) {
+      showErrorBubble('Mikrofona erişilemedi: ' + (err && err.message ? err.message : String(err)));
     }
   });
 
