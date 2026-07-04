@@ -775,9 +775,7 @@
 
   async function pollNewMessages(){
     try {
-      let url = roomUrl() + '.json';
-      if (lastTs > 0) url += '?orderBy=%22ts%22&startAt=' + (lastTs + 1);
-      const res = await fetch(url);
+      const res = await fetch(roomUrl() + '.json');
       if (!res.ok) return;
       const data = await res.json();
       if (!data) return;
