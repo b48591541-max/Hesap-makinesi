@@ -133,12 +133,130 @@
     color: #1a1a1a; font-size: 16px; cursor: pointer;
   }
   #chat-send:disabled { opacity: 0.4; }
+
+  /* ---------- SHARED CENTER SCREEN (name entry) ---------- */
+  .center-screen {
+    display: none; flex-direction: column; align-items: center; justify-content: center;
+    height: 100%; padding: 32px; color: #eee; text-align: center;
+    background: #0b0b0d;
+  }
+  .center-screen h2 { font-weight: 500; font-size: 19px; margin: 18px 0 6px; }
+  .center-screen p { color: #8a8a8f; font-size: 13.5px; line-height: 1.5; margin: 0 0 22px; }
+  .icon-badge {
+    width: 46px; height: 46px; border-radius: 50%; background: #1c1c1f;
+    display: flex; align-items: center; justify-content: center; font-size: 22px;
+  }
+  .field-input {
+    width: 100%; max-width: 300px; background: #1c1c1f; border: 1px solid #2e2e33;
+    color: #fff; border-radius: 12px; padding: 14px 16px; font-size: 16px;
+    margin-bottom: 12px; outline: none;
+  }
+  .field-input:focus { border-color: #ff9f0a; }
+  .primary-btn {
+    width: 100%; max-width: 300px; background: #ff9f0a; color: #1a1a1a;
+    border: none; border-radius: 12px; padding: 14px; font-size: 15.5px;
+    font-weight: 600; cursor: pointer;
+  }
+  .secondary-btn {
+    width: 100%; max-width: 300px; background: #1c1c1f; color: #fff;
+    border: 1px solid #2e2e33; border-radius: 12px; padding: 14px; font-size: 15.5px;
+    font-weight: 600; cursor: pointer; margin-bottom: 12px;
+  }
+  .field-error { color: #ff6961; font-size: 12.5px; margin-top: -4px; margin-bottom: 12px; min-height: 14px; }
+
+  /* ---------- APP HEADER (shared: groups + chat) ---------- */
+  .app-header {
+    display: flex; align-items: center; gap: 10px; padding: 14px 16px;
+    border-bottom: 1px solid #1e1e22; background: #101012;
+  }
+  .icon-btn {
+    width: 34px; height: 34px; border-radius: 50%; background: #1c1c1f; border: none;
+    color: #ff9f0a; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .app-header-title { color: #fff; font-size: 15.5px; font-weight: 600; }
+  .app-header-sub { color: #6f6f74; font-size: 11.5px; }
+  .header-spacer { flex: 1; }
+
+  /* ---------- GROUPS LIST ---------- */
+  #groups-screen { display: none; flex-direction: column; height: 100%; background: #0b0b0d; }
+  #groups-list { flex: 1; overflow-y: auto; }
+  .group-item {
+    display: flex; align-items: center; gap: 12px; padding: 14px 16px;
+    border-bottom: 1px solid #1a1a1d; cursor: pointer;
+  }
+  .group-item:active { background: #141416; }
+  .group-avatar {
+    width: 44px; height: 44px; border-radius: 50%; background: #26262b; color: #ff9f0a;
+    display: flex; align-items: center; justify-content: center; font-weight: 700;
+    font-size: 17px; flex-shrink: 0;
+  }
+  .group-name { color: #fff; font-size: 15px; font-weight: 600; }
+  .group-sub { color: #6f6f74; font-size: 12px; margin-top: 2px; }
+  .groups-empty { color: #55555a; text-align: center; margin-top: 60px; padding: 0 34px; font-size: 13.5px; line-height: 1.6; }
+
+  /* ---------- MODAL SHEET ---------- */
+  #modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+    align-items: flex-end; justify-content: center; z-index: 50;
+  }
+  .modal-sheet {
+    width: 100%; max-width: 400px; background: #161618; border-radius: 20px 20px 0 0;
+    padding: 22px 20px 34px; box-sizing: border-box;
+  }
+  .modal-sheet h3 { color: #fff; font-size: 16.5px; margin: 0 0 4px; }
+  .modal-sheet p.hint { color: #8a8a8f; font-size: 12.5px; line-height: 1.5; margin: 0 0 16px; }
+  .modal-close-row { display: flex; justify-content: flex-end; margin-bottom: 4px; }
+  .modal-close-row button {
+    background: none; border: none; color: #6f6f74; font-size: 22px; cursor: pointer; padding: 4px 8px;
+  }
+  .invite-code-box {
+    background: #1c1c1f; border: 1px dashed #3a3a40; border-radius: 12px;
+    padding: 16px; color: #ff9f0a; font-size: 15px; letter-spacing: 1px;
+    text-align: center; word-break: break-all; margin-bottom: 14px; font-family: monospace;
+  }
+
+  /* ---------- CHAT extras ---------- */
+  #chat-messages {
+    flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 8px;
+  }
+  .msg-row { display: flex; }
+  .msg-row.me { justify-content: flex-end; }
+  .bubble {
+    max-width: 75%; padding: 9px 13px; border-radius: 16px; font-size: 14.5px;
+    line-height: 1.4; word-wrap: break-word; color: #fff;
+  }
+  .bubble.image { padding: 4px; overflow: hidden; }
+  .bubble img { max-width: 220px; width: 100%; border-radius: 12px; display: block; }
+  .bubble .sender { display: block; font-size: 10.5px; opacity: 0.6; margin-bottom: 2px; padding: 0 2px; }
+  .msg-row.me .bubble { background: #ff9f0a; color: #1a1a1a; border-bottom-right-radius: 4px; }
+  .msg-row.them .bubble { background: #26262b; border-bottom-left-radius: 4px; }
+  .msg-empty { color: #55555a; font-size: 13px; text-align: center; margin-top: 40px; }
+  #chat-input-bar {
+    display: flex; gap: 8px; padding: 10px 12px; border-top: 1px solid #1e1e22; background: #101012;
+    align-items: center;
+  }
+  #chat-photo-btn {
+    width: 40px; height: 40px; border-radius: 50%; background: #1c1c1f; border: none;
+    color: #ff9f0a; font-size: 18px; cursor: pointer; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #chat-input {
+    flex: 1; background: #1c1c1f; border: 1px solid #2e2e33; border-radius: 20px;
+    padding: 10px 16px; color: #fff; font-size: 14.5px; outline: none;
+  }
+  #chat-input:focus { border-color: #ff9f0a; }
+  #chat-send {
+    width: 40px; height: 40px; border-radius: 50%; background: #ff9f0a; border: none;
+    color: #1a1a1a; font-size: 16px; cursor: pointer; flex-shrink: 0;
+  }
+  #chat-send:disabled { opacity: 0.4; }
+
 </style>
 </head>
 <body>
 <div id="app">
-
-  <!-- CALCULATOR -->
+<!-- CALCULATOR -->
   <div id="calc-screen">
     <div id="calc-display-wrap">
       <div id="calc-expr"></div>
@@ -147,41 +265,93 @@
     <div id="calc-grid"></div>
   </div>
 
-  <!-- LOCK / ONBOARDING -->
-  <div id="lock-screen">
-    <div id="lock-icon-badge">🔒</div>
-    <h2 id="lock-title">Sohbet anahtarı</h2>
-    <p id="lock-desc">İkinizin de bildiği ortak bir kelime/kod girin. Bu kod hem oda kimliğinizi hem şifrelemeyi belirler — sunucuda asla düz metin olarak tutulmaz.</p>
-    <input id="lock-passphrase" type="password" placeholder="Ortak kod" autocomplete="off" />
-    <input id="lock-name" type="text" placeholder="Adın (karşı tarafa görünecek)" autocomplete="off" />
-    <div id="lock-error"></div>
-    <button class="primary" id="lock-continue">Devam et</button>
+  
+  <!-- NAME ENTRY (first launch only) -->
+  <div id="name-screen" class="center-screen">
+    <div class="icon-badge">🔒</div>
+    <h2>Merhaba</h2>
+    <p>Sohbetlerde görünecek adını gir. Bu ayar bu cihazda saklanır.</p>
+    <input id="name-input" class="field-input" type="text" placeholder="Adın" autocomplete="off" />
+    <div id="name-error" class="field-error"></div>
+    <button class="primary-btn" id="name-continue">Devam et</button>
+  </div>
+
+  <!-- GROUPS LIST -->
+  <div id="groups-screen">
+    <div class="app-header">
+      <button class="icon-btn" id="groups-panic">‹</button>
+      <div>
+        <div class="app-header-title">Sohbetler</div>
+      </div>
+      <div class="header-spacer"></div>
+      <button class="icon-btn" id="groups-add">+</button>
+    </div>
+    <div id="groups-list"></div>
+  </div>
+
+  <!-- CREATE / JOIN MODAL -->
+  <div id="modal-overlay">
+    <div class="modal-sheet" id="modal-choose">
+      <div class="modal-close-row"><button data-close>×</button></div>
+      <h3>Yeni sohbet</h3>
+      <p class="hint">Bir sohbet başlat ya da sana verilen davet koduyla mevcut bir sohbete katıl.</p>
+      <button class="primary-btn" id="choose-create" style="margin-bottom:12px;">Yeni sohbet oluştur</button>
+      <button class="secondary-btn" id="choose-join">Davet koduyla katıl</button>
+    </div>
+
+    <div class="modal-sheet" id="modal-create" style="display:none;">
+      <div class="modal-close-row"><button data-close>×</button></div>
+      <h3>Yeni sohbet oluştur</h3>
+      <p class="hint">Bu sohbete vereceğin isim sadece bu cihazda görünür.</p>
+      <input id="create-name-input" class="field-input" type="text" placeholder="Sohbet adı (örn. Biz)" autocomplete="off" />
+      <div id="create-error" class="field-error"></div>
+      <button class="primary-btn" id="create-submit">Oluştur</button>
+    </div>
+
+    <div class="modal-sheet" id="modal-join" style="display:none;">
+      <div class="modal-close-row"><button data-close>×</button></div>
+      <h3>Davet koduyla katıl</h3>
+      <p class="hint">Karşı tarafın sana gönderdiği kodu yapıştır.</p>
+      <input id="join-code-input" class="field-input" type="text" placeholder="Davet kodu" autocomplete="off" />
+      <input id="join-name-input" class="field-input" type="text" placeholder="Bu sohbete vereceğin isim" autocomplete="off" />
+      <div id="join-error" class="field-error"></div>
+      <button class="primary-btn" id="join-submit">Katıl</button>
+    </div>
+
+    <div class="modal-sheet" id="modal-invite" style="display:none;">
+      <div class="modal-close-row"><button data-close>×</button></div>
+      <h3>Sohbet oluşturuldu 🎉</h3>
+      <p class="hint">Bu kodu karşı tarafa gönder, "Davet koduyla katıl" ile girsin.</p>
+      <div class="invite-code-box" id="invite-code-text"></div>
+      <button class="primary-btn" id="invite-copy" style="margin-bottom:12px;">Kodu kopyala</button>
+      <button class="secondary-btn" id="invite-done">Sohbete geç</button>
+    </div>
   </div>
 
   <!-- CHAT -->
   <div id="chat-screen">
-    <div id="chat-header">
-      <button id="chat-back">‹</button>
+    <div class="app-header">
+      <button class="icon-btn" id="chat-back">‹</button>
       <div>
-        <div id="chat-title">Sohbet</div>
-        <div id="chat-sub">uçtan uca değil, kod-tabanlı şifreli</div>
+        <div class="app-header-title" id="chat-title">Sohbet</div>
+        <div class="app-header-sub" id="chat-sub"></div>
       </div>
     </div>
     <div id="chat-messages"><div class="msg-empty">Henüz mesaj yok. İlk mesajı sen yaz.</div></div>
     <div id="chat-input-bar">
+      <button id="chat-photo-btn">📷</button>
+      <input id="chat-photo-file" type="file" accept="image/*" style="display:none;" />
       <input id="chat-input" type="text" placeholder="Mesaj yaz..." autocomplete="off" />
       <button id="chat-send">➤</button>
     </div>
   </div>
 
 </div>
-
 <script>
 (function(){
   "use strict";
 
   // >>> BURAYI DEĞİŞTİR: Firebase Realtime Database URL'ini buraya yapıştır <<<
-  // Örnek: "https://gizli-not-a1b2c-default-rtdb.europe-west1.firebasedatabase.app"
   const FIREBASE_DB_URL = "https://mesajlasma-eb7d7-default-rtdb.europe-west1.firebasedatabase.app";
 
   const SECRET_CODE = "70+2"; // gizli açılış işlemi
@@ -191,7 +361,7 @@
   const resultEl = document.getElementById('calc-result');
   const gridEl = document.getElementById('calc-grid');
 
-  let tokens = []; // dizideki her eleman: sayı string'i ya da operatör
+  let tokens = [];
   let current = "";
 
   const buttons = [
@@ -235,7 +405,6 @@
     } else if (b.action === 'op') {
       if (current === '' && tokens.length === 0) return;
       if (current !== '') { tokens.push(current); current = ''; }
-      if (tokens.length && !isNaN(tokens[tokens.length-1]) === false) {}
       tokens.push(b.val);
     } else if (b.action === 'clear') {
       tokens = []; current = '';
@@ -250,7 +419,7 @@
       if (normalized === SECRET_CODE) {
         tokens = []; current = '';
         renderCalc();
-        openLockOrChat();
+        openApp();
         return;
       }
 
@@ -266,7 +435,6 @@
 
   function evaluateTokens(toks){
     if (!toks.length) return null;
-    // soldan sağa, çarpma/bölme önce (basit ama makul davranış)
     let nums = [];
     let ops = [];
     for (const t of toks) {
@@ -274,7 +442,6 @@
       else nums.push(parseFloat(t));
     }
     if (nums.length === 0) return null;
-    // önce ×÷
     let stackNums = [nums[0]];
     let stackOps = [];
     for (let i = 0; i < ops.length; i++){
@@ -299,11 +466,12 @@
 
   // ---------------- SCREENS ----------------
   const calcScreen = document.getElementById('calc-screen');
-  const lockScreen = document.getElementById('lock-screen');
+  const nameScreen = document.getElementById('name-screen');
+  const groupsScreen = document.getElementById('groups-screen');
   const chatScreen = document.getElementById('chat-screen');
 
   function show(screen){
-    [calcScreen, lockScreen, chatScreen].forEach(s => s.style.display = 'none');
+    [calcScreen, nameScreen, groupsScreen, chatScreen].forEach(s => s.style.display = 'none');
     screen.style.display = 'flex';
   }
 
@@ -311,28 +479,19 @@
   const enc = new TextEncoder();
   const dec = new TextDecoder();
 
-  function bufToB64(buf){
-    return btoa(String.fromCharCode(...new Uint8Array(buf)));
-  }
-  function b64ToBuf(b64){
-    return Uint8Array.from(atob(b64), c => c.charCodeAt(0)).buffer;
-  }
+  function bufToB64(buf){ return btoa(String.fromCharCode(...new Uint8Array(buf))); }
+  function b64ToBuf(b64){ return Uint8Array.from(atob(b64), c => c.charCodeAt(0)).buffer; }
 
   async function sha256Hex(str){
     const digest = await crypto.subtle.digest('SHA-256', enc.encode(str));
     return Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2,'0')).join('');
   }
 
-  async function deriveKey(passphrase){
-    const keyMaterial = await crypto.subtle.importKey(
-      'raw', enc.encode(passphrase), 'PBKDF2', false, ['deriveKey']
-    );
+  async function deriveKey(seed){
+    const keyMaterial = await crypto.subtle.importKey('raw', enc.encode(seed), 'PBKDF2', false, ['deriveKey']);
     return crypto.subtle.deriveKey(
       { name: 'PBKDF2', salt: enc.encode('gizli-mesaj-sabit-tuz'), iterations: 100000, hash: 'SHA-256' },
-      keyMaterial,
-      { name: 'AES-GCM', length: 256 },
-      false,
-      ['encrypt', 'decrypt']
+      keyMaterial, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']
     );
   }
 
@@ -343,86 +502,241 @@
   }
 
   async function decryptText(key, ivB64, ctB64){
-    const pt = await crypto.subtle.decrypt(
-      { name: 'AES-GCM', iv: new Uint8Array(b64ToBuf(ivB64)) }, key, b64ToBuf(ctB64)
-    );
+    const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: new Uint8Array(b64ToBuf(ivB64)) }, key, b64ToBuf(ctB64));
     return dec.decode(pt);
   }
 
-  // ---------------- SESSION STATE ----------------
-  let session = { passphrase: null, name: null, roomHash: null, key: null };
-  const loadedKeys = new Set();
+  function generateId(){
+    const bytes = crypto.getRandomValues(new Uint8Array(16));
+    return Array.from(bytes).map(b => b.toString(16).padStart(2,'0')).join('');
+  }
 
+  // ---------------- LOCAL STORAGE (profile + groups) ----------------
   function loadProfile(){
-    try {
-      const raw = localStorage.getItem('gizli_profile');
-      return raw ? JSON.parse(raw) : null;
-    } catch (e) {
-      return null;
-    }
+    try { const raw = localStorage.getItem('app_profile'); return raw ? JSON.parse(raw) : null; }
+    catch (e) { return null; }
+  }
+  function saveProfile(p){
+    try { localStorage.setItem('app_profile', JSON.stringify(p)); return true; }
+    catch (e) { return false; }
+  }
+  function loadGroups(){
+    try { const raw = localStorage.getItem('app_groups'); return raw ? JSON.parse(raw) : []; }
+    catch (e) { return []; }
+  }
+  function saveGroups(list){
+    try { localStorage.setItem('app_groups', JSON.stringify(list)); return true; }
+    catch (e) { return false; }
   }
 
-  function saveProfile(profile){
-    try {
-      localStorage.setItem('gizli_profile', JSON.stringify(profile));
-      return true;
-    } catch (e) {
-      return false;
+  let profile = null;
+  let groups = [];
+  let activeGroup = null;
+  let session = { roomHash: null, key: null };
+
+  // ---------------- PANIC / HARDWARE BACK ----------------
+  let historyGuarded = false;
+  function guardHistory(){
+    if (!historyGuarded) {
+      history.pushState({ guard: true }, '', location.href);
+      historyGuarded = true;
     }
   }
+  window.addEventListener('popstate', () => { panic(); });
 
-  async function openLockOrChat(){
-    const saved = loadProfile();
-    if (saved && saved.passphrase && saved.name) {
-      session.passphrase = saved.passphrase;
-      session.name = saved.name;
-      await initRoom();
-      show(chatScreen);
-      startPolling();
-      return;
-    }
-    document.getElementById('lock-error').textContent = '';
-    document.getElementById('lock-passphrase').value = '';
-    document.getElementById('lock-name').value = '';
-    show(lockScreen);
+  function panic(){
+    stopPolling();
+    closeModal();
+    tokens = []; current = '';
+    renderCalc();
+    show(calcScreen);
   }
 
-  document.getElementById('lock-continue').addEventListener('click', async () => {
-    const pass = document.getElementById('lock-passphrase').value.trim();
-    const name = document.getElementById('lock-name').value.trim();
-    const errEl = document.getElementById('lock-error');
+  // ---------------- APP ENTRY ----------------
+  function openApp(){
+    guardHistory();
+    profile = loadProfile();
+    if (!profile || !profile.name) {
+      document.getElementById('name-error').textContent = '';
+      document.getElementById('name-input').value = '';
+      show(nameScreen);
+      return;
+    }
+    showGroupsScreen();
+  }
 
-    if (FIREBASE_DB_URL === 'REPLACE-WITH-YOUR-PROJECT' || !FIREBASE_DB_URL) {
-      errEl.textContent = 'Önce koddaki FIREBASE_DB_URL kısmını kendi Firebase linkinle değiştirmelisin.';
-      return;
-    }
-    if (!pass || !name) {
-      errEl.textContent = 'Her iki alanı da doldur.';
-      return;
-    }
-    session.passphrase = pass;
-    session.name = name;
-    if (!saveProfile({ passphrase: pass, name })) {
-      errEl.textContent = 'Bu tarayıcıda kayıt yapılamadı (gizli/özel sekme olabilir).';
-      return;
-    }
-    await initRoom();
-    show(chatScreen);
-    startPolling();
+  document.getElementById('name-continue').addEventListener('click', () => {
+    const val = document.getElementById('name-input').value.trim();
+    const err = document.getElementById('name-error');
+    if (!val) { err.textContent = 'Bir isim gir.'; return; }
+    if (!saveProfile({ name: val })) { err.textContent = 'Kaydedilemedi, bu tarayıcıda özel/gizli sekme olabilir.'; return; }
+    profile = { name: val };
+    showGroupsScreen();
+  });
+  document.getElementById('name-input').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') document.getElementById('name-continue').click();
   });
 
-  async function initRoom(){
-    session.roomHash = (await sha256Hex(session.passphrase)).slice(0, 20);
-    session.key = await deriveKey(session.passphrase);
-    document.getElementById('chat-sub').textContent = 'oda: ' + session.roomHash.slice(0,8) + '…';
+  function showGroupsScreen(){
+    groups = loadGroups();
+    renderGroups();
+    show(groupsScreen);
   }
 
-  // ---------------- CHAT (Firebase Realtime Database) ----------------
+  function renderGroups(){
+    const listEl = document.getElementById('groups-list');
+    if (!groups.length) {
+      listEl.innerHTML = '<div class="groups-empty">Henüz bir sohbetin yok.<br>Sağ üstteki + ile yeni bir sohbet oluştur ya da davet koduyla katıl.</div>';
+      return;
+    }
+    listEl.innerHTML = '';
+    groups.forEach(g => {
+      const row = document.createElement('div');
+      row.className = 'group-item';
+      const avatar = document.createElement('div');
+      avatar.className = 'group-avatar';
+      avatar.textContent = (g.name || '?').trim().charAt(0).toUpperCase() || '?';
+      const info = document.createElement('div');
+      const nameEl = document.createElement('div');
+      nameEl.className = 'group-name';
+      nameEl.textContent = g.name;
+      info.appendChild(nameEl);
+      row.appendChild(avatar);
+      row.appendChild(info);
+      row.addEventListener('click', () => openChat(g));
+      listEl.appendChild(row);
+    });
+  }
+
+  document.getElementById('groups-panic').addEventListener('click', panic);
+
+  // ---------------- MODAL (create / join) ----------------
+  const overlay = document.getElementById('modal-overlay');
+  const sheets = {
+    choose: document.getElementById('modal-choose'),
+    create: document.getElementById('modal-create'),
+    join: document.getElementById('modal-join'),
+    invite: document.getElementById('modal-invite'),
+  };
+
+  function openModal(view){
+    overlay.style.display = 'flex';
+    Object.values(sheets).forEach(s => s.style.display = 'none');
+    sheets[view].style.display = 'block';
+  }
+  function closeModal(){
+    overlay.style.display = 'none';
+    document.getElementById('create-name-input').value = '';
+    document.getElementById('create-error').textContent = '';
+    document.getElementById('join-code-input').value = '';
+    document.getElementById('join-name-input').value = '';
+    document.getElementById('join-error').textContent = '';
+  }
+
+  document.getElementById('groups-add').addEventListener('click', () => openModal('choose'));
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
+  document.querySelectorAll('[data-close]').forEach(btn => btn.addEventListener('click', closeModal));
+
+  document.getElementById('choose-create').addEventListener('click', () => openModal('create'));
+  document.getElementById('choose-join').addEventListener('click', () => openModal('join'));
+
+  let pendingNewGroup = null;
+
+  document.getElementById('create-submit').addEventListener('click', () => {
+    const name = document.getElementById('create-name-input').value.trim();
+    const err = document.getElementById('create-error');
+    if (!name) { err.textContent = 'Bir sohbet adı gir.'; return; }
+    const id = generateId();
+    const group = { id, name };
+    groups.unshift(group);
+    if (!saveGroups(groups)) { err.textContent = 'Kaydedilemedi, tekrar dene.'; return; }
+    pendingNewGroup = group;
+    document.getElementById('invite-code-text').textContent = id;
+    document.getElementById('invite-copy').textContent = 'Kodu kopyala';
+    openModal('invite');
+  });
+
+  document.getElementById('invite-copy').addEventListener('click', async () => {
+    const id = document.getElementById('invite-code-text').textContent;
+    const btn = document.getElementById('invite-copy');
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(id);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = id; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      btn.textContent = 'Kopyalandı ✓';
+    } catch (e) {
+      btn.textContent = 'Kopyalanamadı, elle seç';
+    }
+  });
+
+  document.getElementById('invite-done').addEventListener('click', () => {
+    closeModal();
+    renderGroups();
+    if (pendingNewGroup) openChat(pendingNewGroup);
+    pendingNewGroup = null;
+  });
+
+  document.getElementById('join-submit').addEventListener('click', () => {
+    const code = document.getElementById('join-code-input').value.trim();
+    const name = document.getElementById('join-name-input').value.trim();
+    const err = document.getElementById('join-error');
+    if (!code || code.length < 8) { err.textContent = 'Geçerli bir davet kodu yapıştır.'; return; }
+    if (!name) { err.textContent = 'Bu sohbete bir isim ver.'; return; }
+    const group = { id: code, name };
+    groups.unshift(group);
+    if (!saveGroups(groups)) { err.textContent = 'Kaydedilemedi, tekrar dene.'; return; }
+    closeModal();
+    renderGroups();
+    openChat(group);
+  });
+
+  // ---------------- CHAT ----------------
   const messagesEl = document.getElementById('chat-messages');
   const inputEl = document.getElementById('chat-input');
   const sendBtn = document.getElementById('chat-send');
+  const photoBtn = document.getElementById('chat-photo-btn');
+  const photoFileEl = document.getElementById('chat-photo-file');
+
   let pollTimer = null;
   let renderedMessages = [];
+  let loadedKeys = new Set();
+  let lastTs = 0;
+
+  async function initRoomForGroup(group){
+    session.roomHash = (await sha256Hex(group.id)).slice(0, 20);
+    session.key = await deriveKey(group.id);
+  }
+
+  function openChat(group){
+    activeGroup = group;
+    document.getElementById('chat-title').textContent = group.name;
+    document.getElementById('chat-sub').textContent = '';
+    show(chatScreen);
+    initRoomForGroup(group).then(() => startPolling());
+  }
+
+  document.getElementById('chat-back').addEventListener('click', () => {
+    stopPolling();
+    showGroupsScreen();
+  });
+
+  function showErrorBubble(text){
+    const row = document.createElement('div');
+    row.className = 'msg-row them';
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.style.background = '#5c1a1a';
+    bubble.textContent = text;
+    row.appendChild(bubble);
+    messagesEl.appendChild(row);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
 
   function renderMessages(){
     if (!renderedMessages.length) {
@@ -433,16 +747,22 @@
     messagesEl.innerHTML = '';
     for (const m of renderedMessages) {
       const row = document.createElement('div');
-      row.className = 'msg-row ' + (m.sender === session.name ? 'me' : 'them');
+      row.className = 'msg-row ' + (m.sender === profile.name ? 'me' : 'them');
       const bubble = document.createElement('div');
-      bubble.className = 'bubble';
-      if (m.sender !== session.name) {
+      bubble.className = 'bubble' + (m.type === 'image' ? ' image' : '');
+      if (m.sender !== profile.name) {
         const s = document.createElement('span');
         s.className = 'sender';
         s.textContent = m.sender;
         bubble.appendChild(s);
       }
-      bubble.appendChild(document.createTextNode(m.text));
+      if (m.type === 'image') {
+        const img = document.createElement('img');
+        img.src = 'data:image/jpeg;base64,' + m.content;
+        bubble.appendChild(img);
+      } else {
+        bubble.appendChild(document.createTextNode(m.content));
+      }
       row.appendChild(bubble);
       messagesEl.appendChild(row);
     }
@@ -455,7 +775,9 @@
 
   async function pollNewMessages(){
     try {
-      const res = await fetch(roomUrl() + '.json');
+      let url = roomUrl() + '.json';
+      if (lastTs > 0) url += '?orderBy=%22ts%22&startAt=' + (lastTs + 1);
+      const res = await fetch(url);
       if (!res.ok) return;
       const data = await res.json();
       if (!data) return;
@@ -464,10 +786,11 @@
         if (loadedKeys.has(key)) continue;
         const item = data[key];
         try {
-          const text = await decryptText(session.key, item.iv, item.ct);
-          renderedMessages.push({ sender: item.sender, text, ts: item.ts });
+          const content = await decryptText(session.key, item.iv, item.ct);
+          renderedMessages.push({ sender: item.sender, type: item.type || 'text', content, ts: item.ts });
+          if (item.ts > lastTs) lastTs = item.ts;
         } catch (e) {
-          // yanlış anahtarla şifrelenmiş / bozuk kayıt, atla
+          // çözülemeyen kayıt, atla
         }
         loadedKeys.add(key);
         changed = true;
@@ -480,7 +803,8 @@
 
   function startPolling(){
     renderedMessages = [];
-    loadedKeys.clear();
+    loadedKeys = new Set();
+    lastTs = 0;
     renderMessages();
     pollNewMessages();
     if (pollTimer) clearInterval(pollTimer);
@@ -491,55 +815,68 @@
     if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
   }
 
-  async function sendMessage(){
-    const text = inputEl.value.trim();
-    if (!text) return;
-    inputEl.value = '';
-    sendBtn.disabled = true;
+  async function pushMessage(type, content){
     try {
-      const { iv, ct } = await encryptText(session.key, text);
+      const { iv, ct } = await encryptText(session.key, content);
       const ts = Date.now();
       const key = ts + '_' + Math.random().toString(36).slice(2,8);
       const res = await fetch(roomUrl() + '/' + key + '.json', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ iv, ct, sender: session.name, ts })
+        body: JSON.stringify({ iv, ct, type, sender: profile.name, ts })
       });
       if (!res.ok) {
         const bodyText = await res.text().catch(() => '');
         throw new Error('HTTP ' + res.status + ' ' + res.statusText + (bodyText ? ' — ' + bodyText : ''));
       }
-      renderedMessages.push({ sender: session.name, text, ts });
+      renderedMessages.push({ sender: profile.name, type, content, ts });
       loadedKeys.add(key);
+      if (ts > lastTs) lastTs = ts;
       renderMessages();
     } catch (e) {
-      const row = document.createElement('div');
-      row.className = 'msg-row them';
-      const bubble = document.createElement('div');
-      bubble.className = 'bubble';
-      bubble.style.background = '#5c1a1a';
-      bubble.textContent = 'Gönderilemedi — hata: ' + (e && e.message ? e.message : String(e));
-      row.appendChild(bubble);
-      messagesEl.appendChild(row);
-      messagesEl.scrollTop = messagesEl.scrollHeight;
-    } finally {
-      sendBtn.disabled = false;
+      showErrorBubble('Gönderilemedi — hata: ' + (e && e.message ? e.message : String(e)));
     }
+  }
+
+  async function sendMessage(){
+    const text = inputEl.value.trim();
+    if (!text) return;
+    inputEl.value = '';
+    sendBtn.disabled = true;
+    await pushMessage('text', text);
+    sendBtn.disabled = false;
   }
 
   sendBtn.addEventListener('click', sendMessage);
   inputEl.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendMessage(); });
 
-  document.getElementById('chat-back').addEventListener('click', () => {
-    stopPolling();
-    tokens = []; current = '';
-    renderCalc();
-    show(calcScreen);
-  });
+  function resizeImageFile(file){
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = () => reject(new Error('dosya okunamadı'));
+      reader.onload = () => {
+        const img = new Image();
+        img.onerror = () => reject(new Error('görsel açılamadı'));
+        img.onload = () => {
+          const maxDim = 720;
+          let w = img.width, h = img.height;
+          if (w > maxDim || h > maxDim) {
+            if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
+            else { w = Math.round(w * maxDim / h); h = maxDim; }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+          resolve(dataUrl.split(',')[1]);
+        };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
 
-  // başlangıç
-  show(calcScreen);
-})();
-</script>
-</body>
-</html>
+  photoBtn.addEventListener('click', () => photoFileEl.click());
+  photoFileEl.addEventListener('change', async (e) => {
+    const file = e.targe
