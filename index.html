@@ -879,4 +879,21 @@
 
   photoBtn.addEventListener('click', () => photoFileEl.click());
   photoFileEl.addEventListener('change', async (e) => {
-    const file = e.targe
+    const file = e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+    try {
+      const base64 = await resizeImageFile(file);
+      await pushMessage('image', base64);
+    } catch (err) {
+      showErrorBubble('Fotoğraf gönderilemedi: ' + (err && err.message ? err.message : String(err)));
+    }
+  });
+
+  // başlangıç
+  show(calcScreen);
+})();
+
+</script>
+</body>
+</html>
