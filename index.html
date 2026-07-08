@@ -23,6 +23,7 @@
   #app {
     width: 100%; height: 100vh; height: 100dvh; max-width: 400px; margin: 0 auto;
     display: flex; flex-direction: column; position: relative;
+    overflow-x: hidden;
     background: #000;
   }
 
@@ -39,9 +40,9 @@
   #chat-title { color: #fff; font-size: 15.5px; font-weight: 600; }
   #chat-sub { color: #6f6f74; font-size: 11.5px; }
   #chat-messages {
-    flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 8px;
+    flex: 1; overflow-y: auto; overflow-x: hidden; padding: 16px; display: flex; flex-direction: column; gap: 8px;
   }
-  .msg-row { display: flex; }
+  .msg-row { display: flex; overflow-x: hidden; max-width: 100%; }
   .msg-row.me { justify-content: flex-end; }
   .bubble {
     max-width: 75%; padding: 9px 13px; border-radius: 16px; font-size: 14.5px;
@@ -159,9 +160,9 @@
 
   /* ---------- CHAT extras ---------- */
   #chat-messages {
-    flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 8px;
+    flex: 1; overflow-y: auto; overflow-x: hidden; padding: 16px; display: flex; flex-direction: column; gap: 8px;
   }
-  .msg-row { display: flex; }
+  .msg-row { display: flex; overflow-x: hidden; max-width: 100%; }
   .msg-row.me { justify-content: flex-end; }
   .bubble {
     max-width: 75%; padding: 9px 13px; border-radius: 16px; font-size: 14.5px;
@@ -301,6 +302,36 @@
   body.theme-light .invite-card .ic-text { color: #17171a; }
   body.theme-light .friend-row .f-name, body.theme-light .friend-check-row { color: #17171a; }
 
+  /* ---------- OKUNMAMIŞ MESAJ ROZETİ / DM BÖLÜMLERİ ---------- */
+  .group-item { position: relative; }
+  .unread-badge {
+    min-width: 20px; height: 20px; padding: 0 5px; border-radius: 10px; background: #ff3b30;
+    color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center;
+    margin-left: auto; flex-shrink: 0;
+  }
+  .groups-section-title {
+    padding: 14px 16px 4px; font-size: 11.5px; font-weight: 700; letter-spacing: 0.03em;
+    color: #8a8a8f; text-transform: uppercase;
+  }
+  .friend-row { cursor: pointer; }
+
+  /* ---------- PROFİL FOTOĞRAFI ---------- */
+  .avatar-preview {
+    width: 88px; height: 88px; border-radius: 50%; background: #26262b; color: #ff9f0a;
+    display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: 700;
+    background-size: cover; background-position: center; border: 2px solid #2e2e33; overflow: hidden;
+  }
+  .icon-btn.has-photo {
+    background-size: cover; background-position: center; font-size: 0;
+  }
+  .msg-avatar {
+    width: 26px; height: 26px; border-radius: 50%; background: #26262b; color: #ff9f0a;
+    display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700;
+    background-size: cover; background-position: center; flex-shrink: 0; align-self: flex-end;
+  }
+  .msg-row { align-items: flex-end; gap: 6px; }
+  .msg-row.me { justify-content: flex-end; }
+
 </style>
 </head>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -419,12 +450,38 @@
     <!-- PROFILE / SETTINGS -->
     <div class="modal-sheet" id="modal-profile" style="display:none;">
       <div class="modal-close-row"><button data-close>×</button></div>
-      <h3>Profil ve ayarlar</h3>
-      <p class="hint">Kullanıcı adını ve uygulama temasını buradan değiştirebilirsin.</p>
+      <h3>Profilim</h3>
+
+      <div style="display:flex; flex-direction:column; align-items:center; margin-bottom:18px;">
+        <div id="profile-photo-preview" class="avatar-preview"></div>
+        <input id="profile-photo-file" type="file" accept="image/*" style="display:none;" />
+        <button class="secondary-btn" id="profile-photo-pick" style="margin-top:10px; margin-bottom:6px;">Fotoğrafı değiştir</button>
+        <button id="profile-photo-remove" style="background:none; border:none; color:#ff6961; font-size:12.5px; cursor:pointer;">Fotoğrafı kaldır</button>
+      </div>
+
+      <p class="hint" style="margin-bottom:6px;">Kullanıcı adı</p>
       <input id="profile-name-input" class="field-input" type="text" placeholder="Kullanıcı adı" autocomplete="off" />
+      <button class="primary-btn" id="profile-save" style="margin-bottom:8px;">Adı kaydet</button>
       <div id="profile-error" class="field-error"></div>
-      <button class="primary-btn" id="profile-save" style="margin-bottom:18px;">Kaydet</button>
-      <p class="hint" style="margin-bottom:8px;">Tema</p>
+
+      <p class="hint" style="margin:16px 0 6px;">E-posta</p>
+      <input id="profile-email-input" class="field-input" type="email" placeholder="E-posta" autocomplete="off" />
+      <button class="secondary-btn" id="profile-email-save" style="margin-bottom:8px;">E-postayı güncelle</button>
+      <div id="profile-email-error" class="field-error"></div>
+
+      <p class="hint" style="margin:16px 0 6px;">Yeni şifre</p>
+      <input id="profile-password-input" class="field-input" type="password" placeholder="Yeni şifre (en az 6 karakter)" autocomplete="off" />
+      <button class="secondary-btn" id="profile-password-save" style="margin-bottom:8px;">Şifreyi güncelle</button>
+      <div id="profile-password-error" class="field-error"></div>
+
+      <div id="profile-reauth-block" style="display:none; margin-top:14px; padding-top:14px; border-top:1px solid #1e1e22;">
+        <p class="hint" style="margin-bottom:6px;">Güvenlik için mevcut şifreni gir</p>
+        <input id="profile-reauth-password" class="field-input" type="password" placeholder="Mevcut şifren" autocomplete="off" />
+        <button class="primary-btn" id="profile-reauth-confirm">Onayla ve devam et</button>
+        <div id="profile-reauth-error" class="field-error"></div>
+      </div>
+
+      <p class="hint" style="margin:18px 0 8px;">Tema</p>
       <div class="theme-choice-row">
         <button type="button" id="theme-dark-btn" data-theme="dark">🌙 Koyu</button>
         <button type="button" id="theme-light-btn" data-theme="light">☀️ Açık</button>
@@ -557,14 +614,19 @@
     return db.ref('users/' + profile.uid + '/groups');
   }
 
+  let onGroupsScreen = false;
+
   function attachGroupsListener(){
     detachGroupsListener();
     groupsListenerRef = groupsRef();
     groupsListenerRef.on('value', (snapshot) => {
       const val = snapshot.val() || {};
-      groups = Object.keys(val).map(id => ({ id, name: val[id].name }))
-        .sort((a, b) => (val[b.id].updatedAt || 0) - (val[a.id].updatedAt || 0));
+      groups = Object.keys(val).map(id => ({
+        id, name: val[id].name, lastReadTs: val[id].lastReadTs || 0,
+        isDM: !!val[id].isDM, withUid: val[id].withUid || null
+      })).sort((a, b) => (val[b.id].updatedAt || 0) - (val[a.id].updatedAt || 0));
       renderGroups();
+      if (onGroupsScreen) attachUnreadListeners();
     }, (err) => {
       showErrorOnGroupsScreen('Sohbetler yüklenemedi: ' + (err && err.message ? err.message : String(err)));
     });
@@ -574,8 +636,41 @@
     if (groupsListenerRef) { groupsListenerRef.off(); groupsListenerRef = null; }
   }
 
-  function addGroup(id, name){
-    return groupsRef().child(id).set({ name, updatedAt: Date.now() });
+  function addGroup(id, name, extra){
+    return groupsRef().child(id).update(Object.assign({ name, updatedAt: Date.now() }, extra || {}));
+  }
+
+  // ---------------- OKUNMAMIŞ MESAJ SAYAÇLARI ----------------
+  let unreadCounts = {};        // { groupId: count }
+  let unreadListenerRefs = {};  // { groupId: firebaseRef }
+
+  function detachUnreadListeners(){
+    Object.values(unreadListenerRefs).forEach(ref => ref.off());
+    unreadListenerRefs = {};
+  }
+
+  async function attachUnreadListeners(){
+    detachUnreadListeners();
+    for (const g of groups) {
+      try {
+        const hash = (await sha256Hex(g.id)).slice(0, 20);
+        const ref = db.ref('messages/' + hash).orderByChild('ts').startAt((g.lastReadTs || 0) + 1);
+        unreadListenerRefs[g.id] = ref;
+        ref.on('value', (snap) => {
+          unreadCounts[g.id] = snap.numChildren();
+          renderGroups();
+        });
+      } catch (e) { /* sessizce atla */ }
+    }
+  }
+
+  function formatUnreadCount(n){
+    return n > 99 ? '99+' : String(n);
+  }
+
+  async function markGroupRead(group){
+    unreadCounts[group.id] = 0;
+    try { await groupsRef().child(group.id).update({ lastReadTs: Date.now() }); } catch (e) {}
   }
 
   // ---------------- ARKADAŞLAR ----------------
@@ -690,21 +785,50 @@
       name.className = 'f-name';
       name.textContent = f.name;
       row.appendChild(name);
+      const chatHint = document.createElement('span');
+      chatHint.textContent = '💬';
+      chatHint.style.opacity = '0.6';
+      chatHint.style.fontSize = '14px';
+      row.appendChild(chatHint);
       const removeBtn = document.createElement('button');
       removeBtn.className = 'f-remove';
       removeBtn.textContent = 'Kaldır';
-      removeBtn.addEventListener('click', async () => {
+      removeBtn.addEventListener('click', async (e) => {
+        e.stopPropagation();
         if (!confirm(f.name + ' arkadaşlıktan çıkarılsın mı?')) return;
         try {
           await friendsRef().child(uid).remove();
           await db.ref('friends/' + uid + '/' + profile.uid).remove();
-        } catch (e) {
-          alert('Kaldırılamadı: ' + (e && e.message ? e.message : String(e)));
+        } catch (e2) {
+          alert('Kaldırılamadı: ' + (e2 && e2.message ? e2.message : String(e2)));
         }
       });
       row.appendChild(removeBtn);
+      row.addEventListener('click', () => openFriendChat(uid));
       el.appendChild(row);
     });
+  }
+
+  // Bir arkadaşla olan özel (1:1) sohbeti açar; ilk kez konuşuyorsanız gerekli
+  // gizli anahtarı (dmId) o an üretip her iki tarafın arkadaş kaydına yazar.
+  async function openFriendChat(uid){
+    const f = friends[uid];
+    if (!f) return;
+    let dmId = f.dmId;
+    try {
+      if (!dmId) {
+        dmId = generateId();
+        const ts = Date.now();
+        await friendsRef().child(uid).update({ dmId });
+        await db.ref('friends/' + uid + '/' + profile.uid).update({ dmId });
+        friends[uid] = Object.assign({}, f, { dmId });
+      }
+      await addGroup(dmId, f.name, { isDM: true, withUid: uid });
+      closeModal();
+      openChat({ id: dmId, name: f.name });
+    } catch (e) {
+      alert('Sohbet açılamadı: ' + (e && e.message ? e.message : String(e)));
+    }
   }
 
   function renderCreateFriendsList(){
@@ -761,8 +885,9 @@
       const target = snap.val();
       if (target.uid === profile.uid) { err.textContent = 'Bu senin kendi kodun.'; btn.disabled = false; return; }
       const ts = Date.now();
-      await friendsRef().child(target.uid).set({ name: target.name, code, addedAt: ts });
-      await db.ref('friends/' + target.uid + '/' + profile.uid).set({ name: profile.name, code: myFriendCode, addedAt: ts });
+      const dmId = generateId();
+      await friendsRef().child(target.uid).set({ name: target.name, code, addedAt: ts, dmId });
+      await db.ref('friends/' + target.uid + '/' + profile.uid).set({ name: profile.name, code: myFriendCode, addedAt: ts, dmId });
       document.getElementById('add-friend-code-input').value = '';
     } catch (e) {
       err.textContent = 'Eklenemedi: ' + (e && e.message ? e.message : String(e));
@@ -810,11 +935,11 @@
       await ref.set({
         name: group.name,
         adminUid: profile.uid,
-        members: { [profile.uid]: { name: profile.name, nickname: null } },
+        members: { [profile.uid]: { name: profile.name, nickname: null, photo: profile.photo || null } },
         updatedAt: Date.now()
       });
     } else {
-      await ref.child('members/' + profile.uid).update({ name: profile.name });
+      await ref.child('members/' + profile.uid).update({ name: profile.name, photo: profile.photo || null });
     }
   }
 
@@ -935,6 +1060,7 @@
   });
 
   document.getElementById('groups-logout').addEventListener('click', () => {
+    if (!confirm('Hesaptan çıkış yapmak istediğine emin misin?')) return;
     stopMessageListener();
     detachGroupsListener();
     detachFriendsListener();
@@ -945,7 +1071,7 @@
   // ---------------- APP ENTRY (Firebase Auth durumu) ----------------
   auth.onAuthStateChanged((user) => {
     if (user) {
-      profile = { name: user.displayName || user.email, uid: user.uid };
+      profile = { name: user.displayName || user.email, uid: user.uid, photo: null };
       const subEl = document.getElementById('groups-user-sub');
       if (subEl) subEl.textContent = profile.name;
       showGroupsScreen();
@@ -953,6 +1079,10 @@
         attachFriendsListener();
         attachGroupInvitesListener();
       });
+      db.ref('users/' + user.uid + '/photo').once('value').then((snap) => {
+        profile.photo = snap.val() || null;
+        applyHeaderAvatar();
+      }).catch(() => {});
     } else {
       stopMessageListener();
       detachGroupsListener();
@@ -968,9 +1098,24 @@
     }
   });
 
+  function applyHeaderAvatar(){
+    const btn = document.getElementById('groups-profile');
+    if (!btn) return;
+    if (profile && profile.photo) {
+      btn.classList.add('has-photo');
+      btn.style.backgroundImage = 'url(' + profile.photo + ')';
+    } else {
+      btn.classList.remove('has-photo');
+      btn.style.backgroundImage = '';
+      btn.textContent = '👤';
+    }
+  }
+
   function showGroupsScreen(){
+    onGroupsScreen = true;
     renderGroups();
     attachGroupsListener();
+    attachUnreadListeners();
     show(groupsScreen);
   }
 
@@ -981,22 +1126,49 @@
       return;
     }
     listEl.innerHTML = '';
-    groups.forEach(g => {
+
+    function renderRow(g){
       const row = document.createElement('div');
       row.className = 'group-item';
       const avatar = document.createElement('div');
       avatar.className = 'group-avatar';
       avatar.textContent = (g.name || '?').trim().charAt(0).toUpperCase() || '?';
       const info = document.createElement('div');
+      info.style.flex = '1';
       const nameEl = document.createElement('div');
       nameEl.className = 'group-name';
       nameEl.textContent = g.name;
       info.appendChild(nameEl);
       row.appendChild(avatar);
       row.appendChild(info);
+      const count = unreadCounts[g.id] || 0;
+      if (count > 0) {
+        const badge = document.createElement('div');
+        badge.className = 'unread-badge';
+        badge.textContent = formatUnreadCount(count);
+        row.appendChild(badge);
+      }
       row.addEventListener('click', () => openChat(g));
       listEl.appendChild(row);
-    });
+    }
+
+    const dms = groups.filter(g => g.isDM);
+    const rooms = groups.filter(g => !g.isDM);
+
+    if (dms.length) {
+      const h = document.createElement('div');
+      h.className = 'groups-section-title';
+      h.textContent = 'Arkadaşların';
+      listEl.appendChild(h);
+      dms.forEach(renderRow);
+    }
+    if (rooms.length) {
+      const h = document.createElement('div');
+      h.className = 'groups-section-title';
+      h.textContent = 'Gruplar';
+      listEl.appendChild(h);
+      rooms.forEach(renderRow);
+    }
   }
 
   // ---------------- MODAL (create / join) ----------------
@@ -1060,9 +1232,16 @@
         console.warn('Arkadaşlara davet gönderilemedi:', metaErr);
       }
       pendingNewGroup = { id, name };
-      document.getElementById('invite-code-text').textContent = id;
-      document.getElementById('invite-copy').textContent = 'Kodu kopyala';
-      openModal('invite');
+      if (selectedUids.length > 0) {
+        // Arkadaşlar zaten davet edildi, davet kodu göstermeye gerek yok — direkt sohbete gir.
+        closeModal();
+        openChat(pendingNewGroup);
+        pendingNewGroup = null;
+      } else {
+        document.getElementById('invite-code-text').textContent = id;
+        document.getElementById('invite-copy').textContent = 'Kodu kopyala';
+        openModal('invite');
+      }
     } catch (e) {
       err.textContent = 'Kaydedilemedi: ' + (e && e.message ? e.message : String(e));
     }
@@ -1114,9 +1293,26 @@
   });
 
   // ---------------- PROFİL / KULLANICI ADI / TEMA ----------------
+  function renderProfilePhotoPreview(){
+    const el = document.getElementById('profile-photo-preview');
+    el.style.backgroundImage = '';
+    el.textContent = '';
+    if (profile && profile.photo) {
+      el.style.backgroundImage = 'url(' + profile.photo + ')';
+    } else {
+      el.textContent = (profile && profile.name ? profile.name.trim().charAt(0).toUpperCase() : '?') || '?';
+    }
+  }
+
   document.getElementById('groups-profile').addEventListener('click', () => {
     document.getElementById('profile-name-input').value = profile ? profile.name : '';
+    document.getElementById('profile-email-input').value = (auth.currentUser && auth.currentUser.email) || '';
     document.getElementById('profile-error').textContent = '';
+    document.getElementById('profile-email-error').textContent = '';
+    document.getElementById('profile-password-error').textContent = '';
+    document.getElementById('profile-password-input').value = '';
+    document.getElementById('profile-reauth-block').style.display = 'none';
+    renderProfilePhotoPreview();
     openModal('profile');
   });
 
@@ -1127,6 +1323,7 @@
     const newName = document.getElementById('profile-name-input').value.trim();
     const err = document.getElementById('profile-error');
     const btn = document.getElementById('profile-save');
+    err.textContent = '';
     if (!newName) { err.textContent = 'Bir kullanıcı adı gir.'; return; }
     btn.disabled = true;
     try {
@@ -1135,9 +1332,154 @@
       profile.name = newName;
       const subEl = document.getElementById('groups-user-sub');
       if (subEl) subEl.textContent = profile.name;
-      closeModal();
+      err.textContent = 'Kaydedildi ✓';
     } catch (e) {
       err.textContent = 'Güncellenemedi: ' + (e && e.message ? e.message : String(e));
+    }
+    btn.disabled = false;
+  });
+
+  // ---------------- PROFİL FOTOĞRAFI ----------------
+  function resizePhotoFile(file){
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = () => reject(new Error('dosya okunamadı'));
+      reader.onload = () => {
+        const img = new Image();
+        img.onerror = () => reject(new Error('görsel açılamadı'));
+        img.onload = () => {
+          const size = 220;
+          const minSide = Math.min(img.width, img.height);
+          const sx = (img.width - minSide) / 2, sy = (img.height - minSide) / 2;
+          const canvas = document.createElement('canvas');
+          canvas.width = size; canvas.height = size;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, sx, sy, minSide, minSide, 0, 0, size, size);
+          resolve(canvas.toDataURL('image/jpeg', 0.75));
+        };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  document.getElementById('profile-photo-pick').addEventListener('click', () => {
+    document.getElementById('profile-photo-file').click();
+  });
+
+  document.getElementById('profile-photo-file').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+    const err = document.getElementById('profile-error');
+    err.textContent = '';
+    try {
+      const dataUrl = await resizePhotoFile(file);
+      await db.ref('users/' + profile.uid + '/photo').set(dataUrl);
+      profile.photo = dataUrl;
+      renderProfilePhotoPreview();
+      applyHeaderAvatar();
+      err.textContent = 'Fotoğraf güncellendi ✓';
+    } catch (e2) {
+      err.textContent = 'Fotoğraf yüklenemedi: ' + (e2 && e2.message ? e2.message : String(e2));
+    }
+  });
+
+  document.getElementById('profile-photo-remove').addEventListener('click', async () => {
+    try {
+      await db.ref('users/' + profile.uid + '/photo').remove();
+      profile.photo = null;
+      renderProfilePhotoPreview();
+      applyHeaderAvatar();
+    } catch (e) {
+      document.getElementById('profile-error').textContent = 'Kaldırılamadı: ' + (e && e.message ? e.message : String(e));
+    }
+  });
+
+  // ---------------- E-POSTA / ŞİFRE (yeniden kimlik doğrulama gerekebilir) ----------------
+  let pendingReauthAction = null;
+
+  function needsReauth(e){
+    return e && (e.code === 'auth/requires-recent-login');
+  }
+
+  function askReauth(action){
+    pendingReauthAction = action;
+    document.getElementById('profile-reauth-error').textContent = '';
+    document.getElementById('profile-reauth-password').value = '';
+    document.getElementById('profile-reauth-block').style.display = 'block';
+  }
+
+  document.getElementById('profile-reauth-confirm').addEventListener('click', async () => {
+    const pass = document.getElementById('profile-reauth-password').value;
+    const err = document.getElementById('profile-reauth-error');
+    const btn = document.getElementById('profile-reauth-confirm');
+    err.textContent = '';
+    if (!pass) { err.textContent = 'Mevcut şifreni gir.'; return; }
+    btn.disabled = true;
+    try {
+      const cred = firebase.auth.EmailAuthProvider.credential(auth.currentUser.email, pass);
+      await auth.currentUser.reauthenticateWithCredential(cred);
+      document.getElementById('profile-reauth-block').style.display = 'none';
+      if (pendingReauthAction) { await pendingReauthAction(); pendingReauthAction = null; }
+    } catch (e) {
+      err.textContent = friendlyAuthError(e.code) || ('Doğrulanamadı: ' + (e && e.message ? e.message : String(e)));
+    }
+    btn.disabled = false;
+  });
+
+  document.getElementById('profile-email-save').addEventListener('click', async () => {
+    const newEmail = document.getElementById('profile-email-input').value.trim();
+    const err = document.getElementById('profile-email-error');
+    const btn = document.getElementById('profile-email-save');
+    err.textContent = '';
+    if (!newEmail) { err.textContent = 'Bir e-posta gir.'; return; }
+    btn.disabled = true;
+    try {
+      await auth.currentUser.updateEmail(newEmail);
+      err.textContent = 'E-posta güncellendi ✓';
+    } catch (e) {
+      if (needsReauth(e)) {
+        askReauth(async () => {
+          try {
+            await auth.currentUser.updateEmail(newEmail);
+            document.getElementById('profile-email-error').textContent = 'E-posta güncellendi ✓';
+          } catch (e2) {
+            document.getElementById('profile-email-error').textContent = 'Güncellenemedi: ' + (e2 && e2.message ? e2.message : String(e2));
+          }
+        });
+      } else {
+        err.textContent = friendlyAuthError(e.code) || ('Güncellenemedi: ' + (e && e.message ? e.message : String(e)));
+      }
+    }
+    btn.disabled = false;
+  });
+
+  document.getElementById('profile-password-save').addEventListener('click', async () => {
+    const newPass = document.getElementById('profile-password-input').value;
+    const err = document.getElementById('profile-password-error');
+    const btn = document.getElementById('profile-password-save');
+    err.textContent = '';
+    if (!newPass || newPass.length < 6) { err.textContent = 'Şifre en az 6 karakter olmalı.'; return; }
+    btn.disabled = true;
+    try {
+      await auth.currentUser.updatePassword(newPass);
+      document.getElementById('profile-password-input').value = '';
+      err.textContent = 'Şifre güncellendi ✓';
+    } catch (e) {
+      if (needsReauth(e)) {
+        askReauth(async () => {
+          try {
+            await auth.currentUser.updatePassword(newPass);
+            document.getElementById('profile-password-input').value = '';
+            document.getElementById('profile-password-error').textContent = 'Şifre güncellendi ✓';
+          } catch (e2) {
+            document.getElementById('profile-password-error').textContent = 'Güncellenemedi: ' + (e2 && e2.message ? e2.message : String(e2));
+          }
+        });
+      } else {
+        err.textContent = friendlyAuthError(e.code) || ('Güncellenemedi: ' + (e && e.message ? e.message : String(e)));
+      }
     }
     btn.disabled = false;
   });
@@ -1178,6 +1520,9 @@
 
   function openChat(group){
     activeGroup = group;
+    onGroupsScreen = false;
+    detachUnreadListeners();
+    markGroupRead(group);
     document.getElementById('chat-title').textContent = group.name;
     document.getElementById('chat-sub').textContent = '';
     replyTo = null;
@@ -1190,6 +1535,7 @@
   document.getElementById('chat-back').addEventListener('click', () => {
     stopMessageListener();
     detachGroupMetaListener();
+    if (activeGroup) markGroupRead(activeGroup);
     showGroupsScreen();
   });
 
@@ -1455,10 +1801,32 @@
       messagesEl.appendChild(loadMoreRow);
     }
     const myName = myDisplayNameInGroup();
+
+    function photoForUid(uid){
+      if (!uid) return null;
+      if (uid === profile.uid) return profile.photo || null;
+      const m = groupMetaVal && groupMetaVal.members && groupMetaVal.members[uid];
+      return (m && m.photo) || null;
+    }
+
+    function makeAvatarEl(uid, name){
+      const av = document.createElement('div');
+      av.className = 'msg-avatar';
+      const photo = photoForUid(uid);
+      if (photo) {
+        av.style.backgroundImage = 'url(' + photo + ')';
+      } else {
+        av.textContent = (name || '?').trim().charAt(0).toUpperCase() || '?';
+      }
+      return av;
+    }
+
     for (const m of renderedMessages) {
       const isMe = m.senderUid ? (m.senderUid === profile.uid) : (m.sender === myName);
       const row = document.createElement('div');
       row.className = 'msg-row ' + (isMe ? 'me' : 'them');
+
+      if (!isMe) row.appendChild(makeAvatarEl(m.senderUid, m.sender));
 
       const wrap = document.createElement('div');
       wrap.className = 'bubble-wrap';
@@ -1476,6 +1844,7 @@
         bubble.textContent = 'Bu mesaj silindi';
         wrap.appendChild(bubble);
         row.appendChild(wrap);
+        if (isMe) row.appendChild(makeAvatarEl(m.senderUid, m.sender));
         messagesEl.appendChild(row);
         continue;
       }
@@ -1523,6 +1892,7 @@
 
       wrap.appendChild(bubble);
       row.appendChild(wrap);
+      if (isMe) row.appendChild(makeAvatarEl(m.senderUid, m.sender));
       messagesEl.appendChild(row);
       attachBubbleGestures(wrap, m);
     }
