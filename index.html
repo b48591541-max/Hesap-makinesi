@@ -41,7 +41,7 @@
   #chat-title { color: #fff; font-size: 15.5px; font-weight: 600; }
   #chat-sub { color: #6f6f74; font-size: 11.5px; }
   #chat-messages {
-    flex: 1; overflow-y: auto; overflow-x: hidden; padding: 16px; display: flex; flex-direction: column; gap: 8px;
+    flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 16px; display: flex; flex-direction: column; gap: 8px;
     overscroll-behavior-y: contain;
   }
   .msg-row { display: flex; overflow-x: hidden; max-width: 100%; }
@@ -162,7 +162,7 @@
 
   /* ---------- CHAT extras ---------- */
   #chat-messages {
-    flex: 1; overflow-y: auto; overflow-x: hidden; padding: 16px; display: flex; flex-direction: column; gap: 8px;
+    flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 16px; display: flex; flex-direction: column; gap: 8px;
     overscroll-behavior-y: contain;
   }
   .msg-row { display: flex; overflow-x: hidden; max-width: 100%; }
@@ -1815,126 +1815,171 @@
     wrapEl.addEventListener('contextmenu', (e) => { e.preventDefault(); showMessageActions(m, wrapEl); });
   }
 
+  function photoForUid(uid){
+    if (!uid) return null;
+    if (uid === profile.uid) return profile.photo || null;
+    const m = groupMetaVal && groupMetaVal.members && groupMetaVal.members[uid];
+    return (m && m.photo) || null;
+  }
+
+  function makeAvatarEl(uid, name){
+    const av = document.createElement('div');
+    av.className = 'msg-avatar';
+    const photo = photoForUid(uid);
+    if (photo) {
+      av.style.backgroundImage = 'url(' + photo + ')';
+    } else {
+      av.textContent = (name || '?').trim().charAt(0).toUpperCase() || '?';
+    }
+    return av;
+  }
+
+  // Tek bir mesaj balonu için DOM satırı üretir. Önceden renderMessages() içindeydi;
+  // artık her mesaj için yalnızca BİR KEZ çağrılıyor (bkz. renderMessages), her yeni
+  // mesajda tüm sohbeti (önceki tüm fotoğraf/video dahil) yeniden çizmemek için.
+  function buildMessageRow(m, myName){
+    const isMe = m.senderUid ? (m.senderUid === profile.uid) : (m.sender === myName);
+    const row = document.createElement('div');
+    row.className = 'msg-row ' + (isMe ? 'me' : 'them');
+    row.dataset.msgKey = m.key;
+
+    if (!isMe) row.appendChild(makeAvatarEl(m.senderUid, m.sender));
+
+    const wrap = document.createElement('div');
+    wrap.className = 'bubble-wrap';
+
+    const icon = document.createElement('span');
+    icon.className = 'swipe-reply-icon';
+    icon.textContent = '↩';
+    wrap.appendChild(icon);
+
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble' + (m.type === 'image' ? ' image' : m.type === 'video' ? ' video' : m.type === 'audio' ? ' audio' : m.type === 'sticker' ? ' sticker' : '');
+
+    if (m.deleted) {
+      bubble.classList.add('msg-deleted');
+      bubble.textContent = 'Bu mesaj silindi';
+      wrap.appendChild(bubble);
+      row.appendChild(wrap);
+      if (isMe) row.appendChild(makeAvatarEl(m.senderUid, m.sender));
+      return row;
+    }
+
+    if (!isMe) {
+      const s = document.createElement('span');
+      s.className = 'sender';
+      s.textContent = m.sender;
+      bubble.appendChild(s);
+    }
+
+    if (m.replyTo) {
+      const q = document.createElement('div');
+      q.className = 'reply-quote';
+      const rs = document.createElement('span'); rs.className = 'rq-sender'; rs.textContent = m.replyTo.sender;
+      const rt = document.createElement('span'); rt.className = 'rq-text'; rt.textContent = m.replyTo.snippet;
+      q.appendChild(rs); q.appendChild(rt);
+      bubble.appendChild(q);
+    }
+
+    if (m.type === 'image') {
+      const img = document.createElement('img');
+      img.loading = 'lazy';
+      img.src = 'data:image/jpeg;base64,' + m.content;
+      bubble.appendChild(img);
+    } else if (m.type === 'gif') {
+      const img = document.createElement('img');
+      img.loading = 'lazy';
+      img.src = m.content; // tam data URL
+      bubble.appendChild(img);
+    } else if (m.type === 'video') {
+      const vid = document.createElement('video');
+      vid.src = m.content; vid.controls = true; vid.playsInline = true; vid.preload = 'metadata';
+      bubble.appendChild(vid);
+    } else if (m.type === 'audio') {
+      const aud = document.createElement('audio');
+      aud.src = m.content; aud.controls = true; aud.preload = 'metadata';
+      bubble.appendChild(aud);
+    } else if (m.type === 'sticker') {
+      const em = document.createElement('span');
+      em.className = 'sticker-emoji';
+      em.textContent = m.content;
+      bubble.appendChild(em);
+    } else {
+      bubble.appendChild(document.createTextNode(m.content));
+    }
+
+    wrap.appendChild(bubble);
+    row.appendChild(wrap);
+    if (isMe) row.appendChild(makeAvatarEl(m.senderUid, m.sender));
+    attachBubbleGestures(wrap, m);
+    return row;
+  }
+
+  // Sohbeti DOM ile senkronize eder. ÖNEMLİ: eskiden her yeni mesajda (hatta tek bir
+  // fotoğraf gelişinde) messagesEl.innerHTML tamamen SIFIRLANIP tüm mesajlar —
+  // daha önce gönderilmiş tüm fotoğraf/video/GIF'ler dahil — yeniden oluşturuluyordu.
+  // Sohbet uzadıkça (özellikle fotoğraf/video arttıkça) bu her mesajda katlanarak
+  // ağırlaşıyor, telefon yetişemeyip arayüz kilitleniyor ve yeni mesajlar sanki hiç
+  // "gözükmüyormuş" gibi görünüyordu. Şimdi sadece eksik olan mesaj(lar) DOM'a
+  // ekleniyor, var olanlara dokunulmuyor.
   function renderMessages(){
     const prevScrollFromBottom = messagesEl.scrollHeight - messagesEl.scrollTop;
+    renderedMessages.sort((a,b) => a.ts - b.ts);
+
     if (!renderedMessages.length) {
       messagesEl.innerHTML = '<div class="msg-empty">Henüz mesaj yok. İlk mesajı sen yaz.</div>';
       return;
     }
-    renderedMessages.sort((a,b) => a.ts - b.ts);
-    messagesEl.innerHTML = '';
+    const emptyEl = messagesEl.querySelector('.msg-empty');
+    if (emptyEl) emptyEl.remove();
+
+    let loadMoreRow = document.getElementById('load-older-row');
     if (!noOlderLeft) {
-      const loadMoreRow = document.createElement('div');
-      loadMoreRow.id = 'load-older-row';
-      loadMoreRow.style.textAlign = 'center';
-      loadMoreRow.style.margin = '4px 0 10px';
-      const loadMoreBtn = document.createElement('button');
-      loadMoreBtn.textContent = 'Daha eski mesajları yükle';
-      loadMoreBtn.style.background = 'none';
-      loadMoreBtn.style.border = 'none';
-      loadMoreBtn.style.color = '#ff9f0a';
-      loadMoreBtn.style.fontSize = '12.5px';
-      loadMoreBtn.style.cursor = 'pointer';
-      loadMoreBtn.addEventListener('click', loadOlderMessages);
-      loadMoreRow.appendChild(loadMoreBtn);
-      messagesEl.appendChild(loadMoreRow);
+      if (!loadMoreRow) {
+        loadMoreRow = document.createElement('div');
+        loadMoreRow.id = 'load-older-row';
+        loadMoreRow.style.textAlign = 'center';
+        loadMoreRow.style.margin = '4px 0 10px';
+        const loadMoreBtn = document.createElement('button');
+        loadMoreBtn.textContent = 'Daha eski mesajları yükle';
+        loadMoreBtn.style.background = 'none';
+        loadMoreBtn.style.border = 'none';
+        loadMoreBtn.style.color = '#ff9f0a';
+        loadMoreBtn.style.fontSize = '12.5px';
+        loadMoreBtn.style.cursor = 'pointer';
+        loadMoreBtn.addEventListener('click', loadOlderMessages);
+        loadMoreRow.appendChild(loadMoreBtn);
+        messagesEl.insertBefore(loadMoreRow, messagesEl.firstChild);
+      }
+    } else if (loadMoreRow) {
+      loadMoreRow.remove();
+      loadMoreRow = null;
     }
+
     const myName = myDisplayNameInGroup();
+    const wantedKeys = new Set(renderedMessages.map(m => m.key));
 
-    function photoForUid(uid){
-      if (!uid) return null;
-      if (uid === profile.uid) return profile.photo || null;
-      const m = groupMetaVal && groupMetaVal.members && groupMetaVal.members[uid];
-      return (m && m.photo) || null;
-    }
+    // Artık listede olmayan (silindi/pencereden düştü) satırları DOM'dan kaldır.
+    messagesEl.querySelectorAll('[data-msg-key]').forEach(el => {
+      if (!wantedKeys.has(el.dataset.msgKey)) el.remove();
+    });
 
-    function makeAvatarEl(uid, name){
-      const av = document.createElement('div');
-      av.className = 'msg-avatar';
-      const photo = photoForUid(uid);
-      if (photo) {
-        av.style.backgroundImage = 'url(' + photo + ')';
-      } else {
-        av.textContent = (name || '?').trim().charAt(0).toUpperCase() || '?';
-      }
-      return av;
-    }
-
+    // Eksik olan mesajları, doğru sıradaki yerlerine tek tek ekle. Zaten DOM'da
+    // olan mesajlara (dolayısıyla önceki fotoğraf/video elemanlarına) dokunulmuyor.
+    let anchor = loadMoreRow;
     for (const m of renderedMessages) {
-      const isMe = m.senderUid ? (m.senderUid === profile.uid) : (m.sender === myName);
-      const row = document.createElement('div');
-      row.className = 'msg-row ' + (isMe ? 'me' : 'them');
-
-      if (!isMe) row.appendChild(makeAvatarEl(m.senderUid, m.sender));
-
-      const wrap = document.createElement('div');
-      wrap.className = 'bubble-wrap';
-
-      const icon = document.createElement('span');
-      icon.className = 'swipe-reply-icon';
-      icon.textContent = '↩';
-      wrap.appendChild(icon);
-
-      const bubble = document.createElement('div');
-      bubble.className = 'bubble' + (m.type === 'image' ? ' image' : m.type === 'video' ? ' video' : m.type === 'audio' ? ' audio' : m.type === 'sticker' ? ' sticker' : '');
-
-      if (m.deleted) {
-        bubble.classList.add('msg-deleted');
-        bubble.textContent = 'Bu mesaj silindi';
-        wrap.appendChild(bubble);
-        row.appendChild(wrap);
-        if (isMe) row.appendChild(makeAvatarEl(m.senderUid, m.sender));
-        messagesEl.appendChild(row);
-        continue;
+      let el = messagesEl.querySelector('[data-msg-key="' + m.key.replace(/"/g, '\\"') + '"]');
+      if (!el) {
+        el = buildMessageRow(m, myName);
+        if (anchor) anchor.after(el); else messagesEl.insertBefore(el, messagesEl.firstChild);
+      } else if (m.deleted && !el.classList.contains('msg-deleted')) {
+        const fresh = buildMessageRow(m, myName);
+        el.replaceWith(fresh);
+        el = fresh;
       }
-
-      if (!isMe) {
-        const s = document.createElement('span');
-        s.className = 'sender';
-        s.textContent = m.sender;
-        bubble.appendChild(s);
-      }
-
-      if (m.replyTo) {
-        const q = document.createElement('div');
-        q.className = 'reply-quote';
-        const rs = document.createElement('span'); rs.className = 'rq-sender'; rs.textContent = m.replyTo.sender;
-        const rt = document.createElement('span'); rt.className = 'rq-text'; rt.textContent = m.replyTo.snippet;
-        q.appendChild(rs); q.appendChild(rt);
-        bubble.appendChild(q);
-      }
-
-      if (m.type === 'image') {
-        const img = document.createElement('img');
-        img.src = 'data:image/jpeg;base64,' + m.content;
-        bubble.appendChild(img);
-      } else if (m.type === 'gif') {
-        const img = document.createElement('img');
-        img.src = m.content; // tam data URL
-        bubble.appendChild(img);
-      } else if (m.type === 'video') {
-        const vid = document.createElement('video');
-        vid.src = m.content; vid.controls = true; vid.playsInline = true;
-        bubble.appendChild(vid);
-      } else if (m.type === 'audio') {
-        const aud = document.createElement('audio');
-        aud.src = m.content; aud.controls = true;
-        bubble.appendChild(aud);
-      } else if (m.type === 'sticker') {
-        const em = document.createElement('span');
-        em.className = 'sticker-emoji';
-        em.textContent = m.content;
-        bubble.appendChild(em);
-      } else {
-        bubble.appendChild(document.createTextNode(m.content));
-      }
-
-      wrap.appendChild(bubble);
-      row.appendChild(wrap);
-      if (isMe) row.appendChild(makeAvatarEl(m.senderUid, m.sender));
-      messagesEl.appendChild(row);
-      attachBubbleGestures(wrap, m);
+      anchor = el;
     }
+
     if (renderMessages._keepScroll) {
       messagesEl.scrollTop = messagesEl.scrollHeight - prevScrollFromBottom;
       renderMessages._keepScroll = false;
