@@ -44,7 +44,7 @@
     flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 16px; display: flex; flex-direction: column; gap: 8px;
     overscroll-behavior-y: contain;
   }
-  .msg-row { display: flex; overflow-x: hidden; max-width: 100%; }
+  .msg-row { display: flex; overflow-x: hidden; max-width: 100%; flex-shrink: 0; }
   .msg-row.me { justify-content: flex-end; }
   .bubble {
     max-width: 75%; padding: 9px 13px; border-radius: 16px; font-size: 14.5px;
@@ -165,7 +165,7 @@
     flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 16px; display: flex; flex-direction: column; gap: 8px;
     overscroll-behavior-y: contain;
   }
-  .msg-row { display: flex; overflow-x: hidden; max-width: 100%; }
+  .msg-row { display: flex; overflow-x: hidden; max-width: 100%; flex-shrink: 0; }
   .msg-row.me { justify-content: flex-end; }
   .bubble {
     max-width: 75%; padding: 9px 13px; border-radius: 16px; font-size: 14.5px;
@@ -228,7 +228,7 @@
   }
   .reply-quote .rq-sender { color: #ff9f0a; font-weight: 700; display: block; }
   .reply-quote .rq-text { color: inherit; opacity: 0.85; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
-  .bubble-wrap { position: relative; max-width: 75%; touch-action: pan-y; }
+  .bubble-wrap { position: relative; max-width: 75%; touch-action: pan-y; flex-shrink: 0; }
   .msg-row.me .bubble-wrap { margin-left: auto; }
   .bubble-wrap .bubble { max-width: 100%; }
   .swipe-reply-icon {
