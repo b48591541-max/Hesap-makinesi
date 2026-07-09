@@ -1553,6 +1553,15 @@
     document.getElementById('sticker-panel').style.display = 'none';
     show(chatScreen);
     history.pushState({ nav: 'chat' }, '', '#chat');
+    // ÖNEMLİ: eski sohbetin Firebase dinleyicisini burada, HEMEN ve senkron olarak
+    // kapatıyoruz — initRoomForGroup'un (kripto + Firebase okuma/yazma içeren, yavaş
+    // bağlantıda birkaç saniye sürebilen) bitmesini beklemeden. Eskiden dinleyici ancak
+    // startMessageListener() içinde (yani initRoomForGroup tamamlandıktan SONRA)
+    // kapatılıyordu; bu yüzden geçiş sırasındaki birkaç saniye boyunca önceki sohbetten
+    // gelen mesajlar hâlâ dinlenip yeni açılan sohbetin ekranına yazılıyordu.
+    stopMessageListener();
+    renderedMessages = [];
+    renderMessages();
     initRoomForGroup(group).then(() => startMessageListener());
   }
 
