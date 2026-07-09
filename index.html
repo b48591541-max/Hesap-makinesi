@@ -56,7 +56,7 @@
     display: flex; gap: 8px; padding: 10px 12px; border-top: 1px solid #1e1e22; background: #101012;
   }
   #chat-input {
-    flex: 1; background: #1c1c1f; border: 1px solid #2e2e33; border-radius: 20px;
+    flex: 1; min-width: 0; background: #1c1c1f; border: 1px solid #2e2e33; border-radius: 20px;
     padding: 10px 16px; color: #fff; font-size: 16px; outline: none;
   }
   #chat-input:focus { border-color: #ff9f0a; }
@@ -184,7 +184,7 @@
     display: flex; align-items: center; justify-content: center;
   }
   #chat-input {
-    flex: 1; background: #1c1c1f; border: 1px solid #2e2e33; border-radius: 20px;
+    flex: 1; min-width: 0; background: #1c1c1f; border: 1px solid #2e2e33; border-radius: 20px;
     padding: 10px 16px; color: #fff; font-size: 16px; outline: none;
   }
   #chat-input:focus { border-color: #ff9f0a; }
@@ -1187,6 +1187,7 @@
     overlay.style.display = 'flex';
     Object.values(sheets).forEach(s => s.style.display = 'none');
     sheets[view].style.display = 'block';
+    history.pushState({ nav: 'modal', view }, '');
   }
   function closeModal(){
     overlay.style.display = 'none';
@@ -1201,8 +1202,12 @@
   }
 
   document.getElementById('groups-add').addEventListener('click', () => openModal('choose'));
-  overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
-  document.querySelectorAll('[data-close]').forEach(btn => btn.addEventListener('click', closeModal));
+  // Kapatma tetikleyicileri (X, arka plana dokunma) history.back() çağırır;
+  // gerçek kapama işini popstate dinleyicisi yapar — böylece Android'in
+  // donanım geri tuşu da aynı şekilde davranır (uygulamayı kapatmak yerine
+  // önce modalı, sonra sohbeti kapatır).
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) history.back(); });
+  document.querySelectorAll('[data-close]').forEach(btn => btn.addEventListener('click', () => history.back()));
 
   document.getElementById('choose-create').addEventListener('click', () => { renderCreateFriendsList(); openModal('create'); });
   document.getElementById('choose-join').addEventListener('click', () => openModal('join'));
@@ -1529,14 +1534,30 @@
     updateReplyPreviewBar();
     document.getElementById('sticker-panel').style.display = 'none';
     show(chatScreen);
+    history.pushState({ nav: 'chat' }, '');
     initRoomForGroup(group).then(() => startMessageListener());
   }
 
-  document.getElementById('chat-back').addEventListener('click', () => {
+  function leaveChatToGroups(){
     stopMessageListener();
     detachGroupMetaListener();
     if (activeGroup) markGroupRead(activeGroup);
     showGroupsScreen();
+  }
+
+  document.getElementById('chat-back').addEventListener('click', () => history.back());
+
+  // ---------------- ANDROID / TARAYICI "GERİ" TUŞU ----------------
+  // Geri tuşuna basınca uygulamayı kapatmak yerine önce açık modalı, sonra
+  // açık sohbeti kapatıp gruplar ekranına dönsün; gruplar ekranındayken
+  // geri tuşu normal şekilde uygulamadan çıkışa izin verir.
+  window.addEventListener('popstate', () => {
+    if (overlay.style.display !== 'none') {
+      closeModal();
+    } else if (chatScreen.style.display !== 'none') {
+      leaveChatToGroups();
+    }
+    // aksi halde (gruplar ekranındayken) varsayılan davranışa izin ver — uygulama kapanır
   });
 
   // ---------------- GRUP AYARLARI (isim, takma ad, yönetici, silme) ----------------
