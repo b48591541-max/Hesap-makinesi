@@ -610,6 +610,18 @@
     return Array.from(bytes).map(b => b.toString(16).padStart(2,'0')).join('');
   }
 
+  // İki kullanıcı arasındaki DM kimliğini RASTGELE değil, iki uid'den DETERMİNİSTİK
+  // (her zaman aynı sonucu veren) şekilde üretir. Böylece iki taraf da (kim kimi ne
+  // zaman eklerse eklesin, hatta aynı anda birbirini eklerlerse bile) her zaman aynı
+  // dmId'yi hesaplar ve aynı odaya/aynı şifreleme anahtarına düşer. Eskiden rastgele
+  // üretilip iki ayrı yazma işlemiyle senkronize edilmeye çalışılıyordu; iki kullanıcı
+  // birbirini yakın zamanda eklerse bu yazmalar birbirinin üzerine yazabiliyor ve iki
+  // taraf farklı dmId'lerle bitip mesajlar karşı tarafa hiç ulaşmıyordu.
+  async function dmIdFor(uidA, uidB){
+    const pair = [uidA, uidB].sort().join('_');
+    return 'dm' + (await sha256Hex(pair)).slice(0, 24);
+  }
+
   // ---------------- GRUPLAR (Firebase'de, hesaba bağlı — cihazdan bağımsız senkron) ----------------
   let groupsListenerRef = null;
 
@@ -820,8 +832,7 @@
     let dmId = f.dmId;
     try {
       if (!dmId) {
-        dmId = generateId();
-        const ts = Date.now();
+        dmId = await dmIdFor(profile.uid, uid);
         await friendsRef().child(uid).update({ dmId });
         await db.ref('friends/' + uid + '/' + profile.uid).update({ dmId });
         friends[uid] = Object.assign({}, f, { dmId });
@@ -887,10 +898,14 @@
       if (!snap.exists()) { err.textContent = 'Bu kodla bir kullanıcı bulunamadı.'; btn.disabled = false; return; }
       const target = snap.val();
       if (target.uid === profile.uid) { err.textContent = 'Bu senin kendi kodun.'; btn.disabled = false; return; }
+      // Zaten arkadaşsak (karşı taraf bizi az önce eklediyse), var olan dmId'yi koru;
+      // yoksa deterministik olarak hesapla. Böylece iki taraf da (aynı anda ekleseler bile)
+      // her zaman aynı dmId'ye ulaşır.
+      const existing = await friendsRef().child(target.uid).once('value');
       const ts = Date.now();
-      const dmId = generateId();
-      await friendsRef().child(target.uid).set({ name: target.name, code, addedAt: ts, dmId });
-      await db.ref('friends/' + target.uid + '/' + profile.uid).set({ name: profile.name, code: myFriendCode, addedAt: ts, dmId });
+      const dmId = (existing.exists() && existing.val().dmId) ? existing.val().dmId : await dmIdFor(profile.uid, target.uid);
+      await friendsRef().child(target.uid).update({ name: target.name, code, addedAt: ts, dmId });
+      await db.ref('friends/' + target.uid + '/' + profile.uid).update({ name: profile.name, code: myFriendCode, addedAt: ts, dmId });
       document.getElementById('add-friend-code-input').value = '';
     } catch (e) {
       err.textContent = 'Eklenemedi: ' + (e && e.message ? e.message : String(e));
