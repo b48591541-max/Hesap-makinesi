@@ -19,6 +19,7 @@
     background: #000;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     overflow: hidden;
+    overscroll-behavior-y: none;
   }
   #app {
     width: 100%; height: 100vh; height: 100dvh; max-width: 400px; margin: 0 auto;
@@ -41,6 +42,7 @@
   #chat-sub { color: #6f6f74; font-size: 11.5px; }
   #chat-messages {
     flex: 1; overflow-y: auto; overflow-x: hidden; padding: 16px; display: flex; flex-direction: column; gap: 8px;
+    overscroll-behavior-y: contain;
   }
   .msg-row { display: flex; overflow-x: hidden; max-width: 100%; }
   .msg-row.me { justify-content: flex-end; }
@@ -161,6 +163,7 @@
   /* ---------- CHAT extras ---------- */
   #chat-messages {
     flex: 1; overflow-y: auto; overflow-x: hidden; padding: 16px; display: flex; flex-direction: column; gap: 8px;
+    overscroll-behavior-y: contain;
   }
   .msg-row { display: flex; overflow-x: hidden; max-width: 100%; }
   .msg-row.me { justify-content: flex-end; }
@@ -1187,7 +1190,7 @@
     overlay.style.display = 'flex';
     Object.values(sheets).forEach(s => s.style.display = 'none');
     sheets[view].style.display = 'block';
-    history.pushState({ nav: 'modal', view }, '');
+    history.pushState({ nav: 'modal', view }, '', '#modal');
   }
   function closeModal(){
     overlay.style.display = 'none';
@@ -1534,7 +1537,7 @@
     updateReplyPreviewBar();
     document.getElementById('sticker-panel').style.display = 'none';
     show(chatScreen);
-    history.pushState({ nav: 'chat' }, '');
+    history.pushState({ nav: 'chat' }, '', '#chat');
     initRoomForGroup(group).then(() => startMessageListener());
   }
 
