@@ -44,7 +44,7 @@
     flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 16px; display: flex; flex-direction: column; gap: 8px;
     overscroll-behavior-y: contain;
   }
-  .msg-row { display: flex; overflow-x: hidden; max-width: 100%; flex-shrink: 0; }
+  .msg-row { display: flex; overflow-x: hidden; overflow-y: visible; max-width: 100%; flex-shrink: 0; }
   .msg-row.me { justify-content: flex-end; }
   .bubble {
     max-width: 75%; padding: 9px 13px; border-radius: 16px; font-size: 14.5px;
@@ -165,7 +165,7 @@
     flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 16px; display: flex; flex-direction: column; gap: 8px;
     overscroll-behavior-y: contain;
   }
-  .msg-row { display: flex; overflow-x: hidden; max-width: 100%; flex-shrink: 0; }
+  .msg-row { display: flex; overflow-x: hidden; overflow-y: visible; max-width: 100%; flex-shrink: 0; }
   .msg-row.me { justify-content: flex-end; }
   .bubble {
     max-width: 75%; padding: 9px 13px; border-radius: 16px; font-size: 14.5px;
@@ -1570,7 +1570,14 @@
   // açık sohbeti kapatıp gruplar ekranına dönsün; gruplar ekranındayken
   // geri tuşu normal şekilde uygulamadan çıkışa izin verir.
   window.addEventListener('popstate', () => {
-    if (overlay.style.display !== 'none') {
+    // NOT: overlay.style.display, elemanın SATIR İÇİ (inline) stilini okur. Overlay
+    // varsayılan olarak CSS ile gizlendiği (#modal-overlay{display:none}) için, hiç
+    // modal açılıp kapanmadıysa bu satır içi değer boş string ('') olur — 'none' değil.
+    // Eskiden "overlay.style.display !== 'none'" kontrolü bu yüzden yanlışlıkla "modal
+    // açık" sanıp geri tuşuna basıldığında sohbetten çıkılmasını (leaveChatToGroups)
+    // engelliyordu. getComputedStyle ile GERÇEK görünen durumu okuyoruz.
+    const overlayVisible = getComputedStyle(overlay).display !== 'none';
+    if (overlayVisible) {
       closeModal();
     } else if (chatScreen.style.display !== 'none') {
       leaveChatToGroups();
