@@ -52,6 +52,13 @@
   }
   .bubble .sender { display: block; font-size: 10.5px; opacity: 0.6; margin-bottom: 2px; }
   .msg-row.me .bubble { background: #ff9f0a; color: #1a1a1a; border-bottom-right-radius: 4px; }
+  .msg-meta { display: flex; justify-content: flex-end; align-items: center; gap: 4px; margin-top: 3px; }
+  .msg-time { font-size: 11px; opacity: 0.6; }
+  .msg-ticks { font-size: 11px; letter-spacing: -2px; }
+  .msg-row.me .tick-sent { color: rgba(26,26,26,0.55); }
+  .msg-row.me .tick-delivered { color: rgba(26,26,26,0.55); }
+  .msg-row.me .tick-read { color: #1560c9; }
+  .msg-row.them .msg-time { color: inherit; }
   .msg-row.them .bubble { background: #26262b; border-bottom-left-radius: 4px; }
   .msg-empty { color: #55555a; font-size: 13px; text-align: center; margin-top: 40px; }
   #chat-input-bar {
@@ -175,6 +182,13 @@
   .bubble img { max-width: 220px; width: 100%; border-radius: 12px; display: block; }
   .bubble .sender { display: block; font-size: 10.5px; opacity: 0.6; margin-bottom: 2px; padding: 0 2px; }
   .msg-row.me .bubble { background: #ff9f0a; color: #1a1a1a; border-bottom-right-radius: 4px; }
+  .msg-meta { display: flex; justify-content: flex-end; align-items: center; gap: 4px; margin-top: 3px; }
+  .msg-time { font-size: 11px; opacity: 0.6; }
+  .msg-ticks { font-size: 11px; letter-spacing: -2px; }
+  .msg-row.me .tick-sent { color: rgba(26,26,26,0.55); }
+  .msg-row.me .tick-delivered { color: rgba(26,26,26,0.55); }
+  .msg-row.me .tick-read { color: #1560c9; }
+  .msg-row.them .msg-time { color: inherit; }
   .msg-row.them .bubble { background: #26262b; border-bottom-left-radius: 4px; }
   .msg-empty { color: #55555a; font-size: 13px; text-align: center; margin-top: 40px; }
   #chat-input-bar {
@@ -686,6 +700,12 @@
   async function markGroupRead(group){
     unreadCounts[group.id] = 0;
     try { await groupsRef().child(group.id).update({ lastReadTs: Date.now() }); } catch (e) {}
+    // Bu, SADECE bende duran özel okunmamış-sayaç bilgisinden farklı olarak, PAYLAŞIMLI
+    // grup meta verisi içine yazılıyor — diğer üye(ler) bunu görüp mavi tik gösterebilsin diye.
+    try {
+      const hash = (await sha256Hex(group.id)).slice(0, 20);
+      await groupMetaRef(hash).child('members/' + profile.uid).update({ lastReadTs: Date.now() });
+    } catch (e) {}
   }
 
   // ---------------- ARKADAŞLAR ----------------
@@ -978,6 +998,9 @@
       const isAdmin = groupMetaVal.adminUid === profile.uid;
       document.getElementById('chat-sub').textContent = isAdmin ? 'Yönetici: sen' : '';
       renderGroupSettingsIfOpen();
+      // Üyelerden birinin lastReadTs / deliveredTo bilgisi değişmiş olabilir (ör. karşı taraf
+      // sohbeti okudu) — mesajlardaki tik durumlarını güncellemek için yeniden çiziyoruz.
+      renderMessages();
     });
   }
 
@@ -1838,6 +1861,32 @@
     return (m && m.photo) || null;
   }
 
+  // WhatsApp tarzı tik durumu: 'sent' = tek tik (gönderildi ama karşı taraf henüz almadı),
+  // 'delivered' = çift (beyaz) tik (karşı tarafın cihazına ulaştı), 'read' = çift (mavi) tik
+  // (karşı taraf sohbeti bu mesajdan sonraki bir zamanda açıp okudu).
+  // Gruptaki DİĞER tüm üyeler için aynı anda geçerli olması gerekir (hepsi almalı/okumalı).
+  // Mesajın gönderildiği saati "14:05" gibi iki haneli saat:dakika formatında döndürür.
+  function formatMsgTime(ts){
+    const d = new Date(ts);
+    const hh = String(d.getHours()).padStart(2, '0');
+    const mm = String(d.getMinutes()).padStart(2, '0');
+    return hh + ':' + mm;
+  }
+
+  function tickStatusFor(m){
+    if (!groupMetaVal || !groupMetaVal.members) return 'sent';
+    const others = Object.keys(groupMetaVal.members).filter(uid => uid !== profile.uid);
+    if (!others.length) return 'sent';
+    const delivered = m.deliveredTo || {};
+    const allDelivered = others.every(uid => delivered[uid]);
+    if (!allDelivered) return 'sent';
+    const allRead = others.every(uid => {
+      const mem = groupMetaVal.members[uid];
+      return mem && mem.lastReadTs && mem.lastReadTs >= m.ts;
+    });
+    return allRead ? 'read' : 'delivered';
+  }
+
   function makeAvatarEl(uid, name){
     const av = document.createElement('div');
     av.className = 'msg-avatar';
@@ -1923,6 +1972,22 @@
     } else {
       bubble.appendChild(document.createTextNode(m.content));
     }
+
+    // Balonun altında: gönderim saati (herkes için), kendi mesajlarımda saatin yanında ayrıca tik.
+    const meta = document.createElement('div');
+    meta.className = 'msg-meta';
+    const timeEl = document.createElement('span');
+    timeEl.className = 'msg-time';
+    timeEl.textContent = formatMsgTime(m.ts);
+    meta.appendChild(timeEl);
+    if (isMe) {
+      const status = tickStatusFor(m);
+      const ticks = document.createElement('span');
+      ticks.className = 'msg-ticks tick-' + status;
+      ticks.textContent = status === 'sent' ? '✓' : '✓✓';
+      meta.appendChild(ticks);
+    }
+    bubble.appendChild(meta);
 
     wrap.appendChild(bubble);
     row.appendChild(wrap);
@@ -2020,6 +2085,7 @@
       type: payload.type || 'text',
       content: payload.content,
       replyTo: payload.replyTo || null,
+      deliveredTo: item.deliveredTo || null, // WhatsApp tarzı tik durumu için: kimler bu mesajı aldı
       ts: item.ts
     };
   }
@@ -2043,8 +2109,29 @@
         renderedMessages.push(msg);
         if (oldestLoadedTs === null || item.ts < oldestLoadedTs) oldestLoadedTs = item.ts;
         renderMessages();
+        // Bu mesaj BENDEN gelmiyorsa: "iletildi" (delivered) bilgisini işaretle — WhatsApp'taki
+        // çift beyaz tik. Ayrıca sohbet şu an açıksa "okundu" bilgisini de güncelle (mavi tik).
+        if (msg.senderUid && msg.senderUid !== profile.uid) {
+          if (!item.deliveredTo || !item.deliveredTo[profile.uid]) {
+            messagesRef().child(key).child('deliveredTo/' + profile.uid).set(true).catch(() => {});
+          }
+          if (activeGroup && chatScreen.style.display !== 'none') {
+            markGroupRead(activeGroup);
+          }
+        }
       } catch (e) {
         // çözülemeyen kayıt (başka bir grubun anahtarıyla şifrelenmiş olabilir), atla
+      }
+    });
+    // Bir mesajın 'deliveredTo' bilgisi sonradan değiştiğinde (karşı taraf mesajı aldığında)
+    // GÖNDERENİN ekranındaki tikin anında güncellenmesi için dinliyoruz.
+    messageListenerRef.on('child_changed', (snapshot) => {
+      const key = snapshot.key;
+      const item = snapshot.val();
+      const idx = renderedMessages.findIndex(m => m.key === key);
+      if (idx !== -1) {
+        renderedMessages[idx].deliveredTo = item.deliveredTo || null;
+        renderMessages();
       }
     });
     messageListenerRef.on('child_removed', async (snapshot) => {
