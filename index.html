@@ -731,6 +731,10 @@
             try {
               const item = snapshot.val();
               if (!item || !item.ts || item.ts < startTs) return;
+              // Bu sohbette yeni bir mesaj var (ben gönderdim ya da karşı taraf gönderdi):
+              // sohbeti listenin en üstüne taşımak için kendi 'groups' kaydımdaki
+              // updatedAt'i güncelliyoruz. Liste zaten updatedAt'e göre sıralanıyor.
+              groupsRef().child(g.id).update({ updatedAt: item.ts }).catch(() => {});
               const key = await getNotifKey(g.id);
               const payloadJson = await decryptText(key, item.iv, item.ct);
               const payload = JSON.parse(payloadJson);
@@ -798,6 +802,17 @@
         unreadListenerRefs[g.id] = ref;
         ref.on('value', (snap) => {
           unreadCounts[g.id] = snap.numChildren();
+          // Çevrimdışıyken gelen mesajlar da dahil: bu sohbetteki en son mesajın zamanını
+          // bulup sohbeti listenin en üstüne taşıyoruz (canlı bildirim dinleyicisi sadece
+          // uygulama açıkken yakalar; bu ise girişte/yeniden bağlanınca da yakalar).
+          let maxTs = 0;
+          snap.forEach((child) => {
+            const v = child.val();
+            if (v && v.ts && v.ts > maxTs) maxTs = v.ts;
+          });
+          if (maxTs > (g.lastReadTs || 0)) {
+            groupsRef().child(g.id).update({ updatedAt: maxTs }).catch(() => {});
+          }
           renderGroups();
         });
       } catch (e) { /* sessizce atla */ }
