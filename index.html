@@ -399,6 +399,7 @@
       </div>
       <div class="header-spacer"></div>
       <button class="icon-btn" id="groups-friends" title="Arkadaşlar">🧑‍🤝‍🧑</button>
+      <button class="icon-btn" id="groups-notif" title="Bildirimleri aç">🔔</button>
       <button class="icon-btn" id="groups-profile" title="Profil">👤</button>
       <button class="icon-btn" id="groups-logout" title="Çıkış yap">⎋</button>
       <button class="icon-btn" id="groups-add">+</button>
@@ -645,6 +646,115 @@
 
   let onGroupsScreen = false;
 
+  // ---------------- BİLDİRİMLER (uygulama açık/arka plandayken) ----------------
+  // NOT: Bu, telefon kilitliyken veya uygulama TAMAMEN kapalıyken bildirim GÖSTEREMEZ —
+  // bunun için bir push sunucusu (Firebase Cloud Functions vb.) gerekir. Burada yaptığımız,
+  // uygulama en azından açık/arka planda çalışırken (sekme/uygulama süreci canlıyken)
+  // diğer sohbetlerden gelen yeni mesajlar için tarayıcı bildirimi göstermek.
+  let notificationsEnabled = false;
+  let notifListenerRefs = {};
+  const notifKeyCache = {};
+
+  function requestNotificationPermission(){
+    if (typeof Notification === 'undefined') return;
+    if (Notification.permission === 'granted') { notificationsEnabled = true; updateNotifBtn(); return; }
+    if (Notification.permission === 'denied') { updateNotifBtn(); return; }
+    Notification.requestPermission().then((perm) => {
+      notificationsEnabled = (perm === 'granted');
+      updateNotifBtn();
+    }).catch(() => {});
+  }
+
+  function updateNotifBtn(){
+    const btn = document.getElementById('groups-notif');
+    if (!btn) return;
+    if (typeof Notification === 'undefined') { btn.style.display = 'none'; return; }
+    if (Notification.permission === 'granted') {
+      btn.textContent = '🔔';
+      btn.title = 'Bildirimler açık';
+    } else if (Notification.permission === 'denied') {
+      btn.textContent = '🔕';
+      btn.title = 'Bildirimler tarayıcı ayarlarından engellenmiş';
+    } else {
+      btn.textContent = '🔔';
+      btn.title = 'Bildirimleri açmak için dokun';
+    }
+  }
+
+  async function getNotifKey(groupId){
+    if (!notifKeyCache[groupId]) notifKeyCache[groupId] = await deriveKey(groupId);
+    return notifKeyCache[groupId];
+  }
+
+  function notificationBodyFor(payload){
+    switch (payload.type) {
+      case 'image': return '📷 Fotoğraf gönderdi';
+      case 'gif': return 'Bir GIF gönderdi';
+      case 'video': return '🎥 Video gönderdi';
+      case 'audio': return '🎤 Sesli mesaj gönderdi';
+      case 'sticker': return (payload.content || '') + ' çıkartma gönderdi';
+      default: return payload.content || 'Yeni mesaj';
+    }
+  }
+
+  function showLocalNotification(payload, group){
+    if (!notificationsEnabled || typeof Notification === 'undefined') return;
+    try {
+      const title = (payload.sender || 'Yeni mesaj') + ' — ' + group.name;
+      const body = notificationBodyFor(payload);
+      const notif = new Notification(title, { body, tag: 'chat-' + group.id });
+      notif.onclick = () => {
+        try { window.focus(); } catch (e) {}
+        openChat(group);
+        notif.close();
+      };
+    } catch (e) { /* bildirim gösterilemedi, sessizce geç */ }
+  }
+
+  function detachNotificationListeners(){
+    Object.values(notifListenerRefs).forEach(ref => ref.off());
+    notifListenerRefs = {};
+  }
+
+  // Her sohbet (grup + arkadaş DM'leri, hepsi 'groups' listesinde) için, bu fonksiyonun
+  // çağrıldığı andan İTİBAREN gelen yeni mesajları dinler (eski mesajları asla bildirmez).
+  function attachNotificationListeners(){
+    detachNotificationListeners();
+    const startTs = Date.now();
+    for (const g of groups) {
+      (async () => {
+        try {
+          const hash = (await sha256Hex(g.id)).slice(0, 20);
+          const ref = db.ref('messages/' + hash).orderByChild('ts').startAt(startTs);
+          notifListenerRefs[g.id] = ref;
+          ref.on('child_added', async (snapshot) => {
+            try {
+              const item = snapshot.val();
+              if (!item || !item.ts || item.ts < startTs) return;
+              const key = await getNotifKey(g.id);
+              const payloadJson = await decryptText(key, item.iv, item.ct);
+              const payload = JSON.parse(payloadJson);
+              if (payload.senderUid === profile.uid) return; // kendi mesajım
+              // Bu sohbet şu an zaten ekranda açıksa bildirim gösterme (görüyor zaten)
+              const chatCurrentlyOpen = activeGroup && activeGroup.id === g.id &&
+                chatScreen.style.display !== 'none' && document.visibilityState === 'visible';
+              if (chatCurrentlyOpen) return;
+              showLocalNotification(payload, g);
+            } catch (e) { /* çözülemedi, atla */ }
+          });
+        } catch (e) { /* sessizce atla */ }
+      })();
+    }
+  }
+
+  document.getElementById('groups-notif').addEventListener('click', () => {
+    if (Notification.permission === 'denied') {
+      showErrorOnGroupsScreen('Bildirimler tarayıcı/uygulama ayarlarından engellenmiş görünüyor. Ayarlardan izin vermen gerekiyor.');
+      return;
+    }
+    requestNotificationPermission();
+  });
+
   function attachGroupsListener(){
     detachGroupsListener();
     groupsListenerRef = groupsRef();
@@ -656,6 +766,7 @@
       })).sort((a, b) => (val[b.id].updatedAt || 0) - (val[a.id].updatedAt || 0));
       renderGroups();
       if (onGroupsScreen) attachUnreadListeners();
+      attachNotificationListeners();
     }, (err) => {
       showErrorOnGroupsScreen('Sohbetler yüklenemedi: ' + (err && err.message ? err.message : String(err)));
     });
@@ -1116,6 +1227,8 @@
       const subEl = document.getElementById('groups-user-sub');
       if (subEl) subEl.textContent = profile.name;
       showGroupsScreen();
+      updateNotifBtn();
+      requestNotificationPermission();
       ensureFriendCode().then(() => {
         attachFriendsListener();
         attachGroupInvitesListener();
@@ -1129,6 +1242,7 @@
       detachGroupsListener();
       detachFriendsListener();
       detachGroupInvitesListener();
+      detachNotificationListeners();
       profile = null;
       groups = [];
       authEmailInput.value = '';
