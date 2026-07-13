@@ -697,18 +697,43 @@
     }
   }
 
+  // ÖNEMLİ: Android Chrome'da (ve bu uygulamanın çalıştığı PWABuilder/TWA ortamında)
+  // düz "new Notification(...)" ARTIK DESTEKLENMİYOR ve sessizce hata veriyor.
+  // Bunun yerine service worker üzerinden showNotification() kullanmak ZORUNDAYIZ.
   function showLocalNotification(payload, group){
-    if (!notificationsEnabled || typeof Notification === 'undefined') return;
+    if (!notificationsEnabled) return;
+    const title = (payload.sender || 'Yeni mesaj') + ' — ' + group.name;
+    const body = notificationBodyFor(payload);
+    if (navigator.serviceWorker && navigator.serviceWorker.ready) {
+      navigator.serviceWorker.ready.then((reg) => {
+        reg.showNotification(title, { body, tag: 'chat-' + group.id, data: { groupId: group.id } });
+      }).catch(() => tryPlainNotification(title, body, group));
+    } else {
+      tryPlainNotification(title, body, group);
+    }
+  }
+
+  // Service worker hiç yoksa (örn. masaüstü eski tarayıcı) buna düşüyoruz.
+  function tryPlainNotification(title, body, group){
     try {
-      const title = (payload.sender || 'Yeni mesaj') + ' — ' + group.name;
-      const body = notificationBodyFor(payload);
       const notif = new Notification(title, { body, tag: 'chat-' + group.id });
       notif.onclick = () => {
         try { window.focus(); } catch (e) {}
         openChat(group);
         notif.close();
       };
-    } catch (e) { /* bildirim gösterilemedi, sessizce geç */ }
+    } catch (e) { /* bu ortamda hiçbir bildirim yöntemi çalışmadı, sessizce geç */ }
+  }
+
+  // Bildirime dokunulduğunda service worker bize hangi sohbetin açılacağını bildirir.
+  if (navigator.serviceWorker) {
+    navigator.serviceWorker.addEventListener('message', (event) => {
+      if (event.data && event.data.type === 'open-chat' && event.data.groupId) {
+        const g = groups.find(x => x.id === event.data.groupId);
+        try { window.focus(); } catch (e) {}
+        if (g) openChat(g);
+      }
+    });
   }
 
   function detachNotificationListeners(){
